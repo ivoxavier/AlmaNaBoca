@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmação Evento</title>
+    <style>
+        /* Estilos para clientes de email que suportam CSS no head */
+        body { margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif; }
+        table { border-collapse: collapse; }
+        .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+        .content { padding: 30px; color: #333333; line-height: 1.6; }
+        .button {
+            display: inline-block;
+            background-color: #25D366; /* Cor Verde WhatsApp */
+            color: #ffffff;
+            text-decoration: none;
+            padding: 15px 25px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .footer { background-color: #eeeeee; padding: 20px; text-align: center; font-size: 12px; color: #888888; }
+        
+        /* Responsividade para telemóvel */
+        @media screen and (max-width: 600px) {
+            .content { padding: 20px; }
+            .button { display: block; width: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f4f4f4; padding: 20px 0;">
+        <tr>
+            <td>
+                
+                <table class="container" width="600" cellpadding="0" cellspacing="0" border="0" align="center">
+                    
+                    <tr>
+                        <td class="content">
+                            <h2 style="color: #333333; margin-top: 0;">Olá, {{ $json.Nome }} {{ $json.Apelido }},</h2>
+                            
+                            <p>Estás confirmado(a) para o nosso <strong>Webinar Especial com a Marta Martins!</strong></p>
+                            
+                            <p>Queremos que tenhas a melhor experiência possível e por essa razão vamos disponibilizar os materiais de apoio e ferramentas relativas à Live no nosso <strong>Grupo Exclusivo do WhatsApp</strong>.</p>
+                            
+                            <p>Ao fazeres parte, também garantes que és sempre notificado(a) e recebes todos os links relativos à Live.</p>
+                            
+                            <p>Para aderir ao Grupo, clica no botão abaixo:</p>
+
+                            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td align="center">
+                                        <a href="https://chat.whatsapp.com/BxhecKwGSyN3qT3qRMVPbk" class="button" target="_blank">
+                                            ENTRAR NO GRUPO EXCLUSIVO
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p style="margin-top: 30px; border-top: 1px solid #eeeeee; padding-top: 20px;">
+                                Por fim, basta responderes a este email com a frase <strong>"Sim, estarei presente"</strong> para confirmarmos a 100% a tua inscrição!
+                            </p>
+                            
+                            <p>Contamos contigo!</p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="footer">
+                            <p>&copy; 2025 Marta Martins & Equipa. Todos os direitos reservados.</p>
+                        </td>
+                    </tr>
+
+                </table>
+                </td>
+        </tr>
+    </table>
+
+</body>
+</html>
