@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Alma Na Boca</string>
+    <string name="lbl_btbar_home">Home</string>
+
 </resources>
