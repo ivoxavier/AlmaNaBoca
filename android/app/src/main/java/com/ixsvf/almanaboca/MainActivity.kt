@@ -10,7 +10,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import com.ixsvf.almanaboca.screens.LoginScreen
+import com.ixsvf.almanaboca.screens.MenuScreen
 import com.ixsvf.almanaboca.ui.theme.AlmaNaBocaTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,10 +23,27 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AlmaNaBocaTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-
-                }
+                    AlmanaBocaNavigation()
             }
+        }
+    }
+}
+
+@Composable
+fun AlmanaBocaNavigation()
+{
+    val context = LocalContext.current
+
+
+    NavHost(
+        navController = navController,
+        startDestination = startDestination
+    ) {
+        composable(route = Screen.Login.route) {
+            LoginScreen(navController = navController)
+        }
+        composable(route = Screen.Menu.route) {
+            MenuScreen(navController = navController)
         }
     }
 }
