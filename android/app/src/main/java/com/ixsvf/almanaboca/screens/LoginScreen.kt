@@ -1,8 +1,11 @@
 package com.ixsvf.almanaboca.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,19 +13,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.ixsvf.almanaboca.R
 import com.ixsvf.almanaboca.screens.components.BlankSpace
+import com.ixsvf.almanaboca.screens.components.HelpText
+import com.ixsvf.almanaboca.screens.components.LoginButton
+import com.ixsvf.almanaboca.screens.components.OutlinedTextComponent
+import com.ixsvf.almanaboca.screens.components.SummaryTopPageText
+import com.ixsvf.almanaboca.screens.components.TopPageText
 import com.ixsvf.almanaboca.ui.theme.states.LoginUiState
 
 @Composable
 fun LoginScreen(modifier: Modifier = Modifier,
                 uiState: LoginUiState,
                 onLoginClick: (String, String) -> Unit) {
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-
-
-
-
 
     Column(
         modifier = Modifier.fillMaxSize(),
