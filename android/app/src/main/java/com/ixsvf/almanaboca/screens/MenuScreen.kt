@@ -2,6 +2,7 @@ package com.ixsvf.almanaboca.screens
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -22,25 +23,36 @@ import com.ixsvf.almanaboca.viewmodel.SessionViewModel
 sealed class BottomBarScreen(
     val route: String,
     @StringRes val title: Int,
-    @DrawableRes val icon: Int){
-    object Home : BottomBarScreen(AlmanaBocaConstants.NAVIGATION_ROUTES.MENU_SCREEN.HOME,
-        R.string.lbl_btbar_home, R.drawable.ic_home)
-    //object Meditations : BottomBarScreen(MMKConstants.NAVIGATION_ROUTES.MENU_SCREEN.MEDITATION,R.string.lbl_btbar_meditation, R.drawable.ic_meditation)
-    //object Consultations : BottomBarScreen(MMKConstants.NAVIGATION_ROUTES.MENU_SCREEN.CONSULTATION,R.string.lbl_btbar_consultation, R.drawable.ic_consultation)
-    //object Shop : BottomBarScreen(MMKConstants.NAVIGATION_ROUTES.MENU_SCREEN.SHOP,R.string.lbl_btbar_shop, R.drawable.ic_shop)
+    @DrawableRes val icon: Int
+) {
+    object Meditations : BottomBarScreen(
+        AlmanaBocaConstants.NAVIGATION_ROUTES.MENU_SCREEN.MEDITATION,
+        R.string.lbl_btbar_meditation,
+        R.drawable.ic_meditation
+    )
+
+    object Booking : BottomBarScreen(
+        AlmanaBocaConstants.NAVIGATION_ROUTES.MENU_SCREEN.BOOKING,
+        title = R.string.lbl_btbar_booking,
+        icon = R.drawable.ic_consultation
+    )
+    // object Meditations : BottomBarScreen(...)
+    // object Consultations : BottomBarScreen(...)
+    // object Shop : BottomBarScreen(...)
 }
 
 @Composable
-fun MenuScreen(navController: NavController, sessionViewModel: SessionViewModel = viewModel())
-{
+fun MenuScreen(
+    navController: NavController,
+    sessionViewModel: SessionViewModel = viewModel()
+) {
+    // This controller manages ONLY the bottom bar tabs (Home, Shop, etc.)
     val bottomBarNavController = rememberNavController()
 
     Scaffold(
-        bottomBar = { BottomNavigationBar(navController = bottomBarNavController) },
-
-        )
-    { paddingValues ->
-
+        bottomBar = { BottomNavigationBar(navController = bottomBarNavController) }
+    ) { paddingValues ->
+        // We pass the paddingValues to the Host via modifier
         MenuNavHost(
             navController = bottomBarNavController,
             modifier = Modifier.padding(paddingValues)
@@ -49,25 +61,25 @@ fun MenuScreen(navController: NavController, sessionViewModel: SessionViewModel 
 }
 
 @Composable
-fun MenuNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
+fun MenuNavHost(
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
     NavHost(
         navController = navController,
-        startDestination = BottomBarScreen.Home.route,
-        modifier = modifier // Aplicar modifier ao NavHost
+        startDestination = BottomBarScreen.Meditations.route,
+        modifier = modifier // 1. The NavHost applies the Scaffold padding here
     ) {
-        composable(route = BottomBarScreen.Home.route) {
-            // Passar o modifier para dentro da HomeScreen
-            HomeScreen(modifier = modifier)
+        composable(route = BottomBarScreen.Meditations.route) {
+            // 2. Do NOT pass 'modifier' here. The NavHost already handled the padding.
+            // Just let HomeScreen fill the available space inside the NavHost.
+            HomeScreen(modifier = Modifier.fillMaxSize())
         }
-        //composable(route = BottomBarScreen.Meditations.route) {
-            // É boa prática passar o modifier para todos os ecrãs
-            ////MeditationScreen()
-        //}
-        //composable(route = BottomBarScreen.Consultations.route) {
-            //ConsultationScreen()
-        //}
-        //composable(route = BottomBarScreen.Shop.route) {
-            //ShopScreen()
-        //}
+
+        composable(route = BottomBarScreen.Booking.route) {
+            // 2. Do NOT pass 'modifier' here. The NavHost already handled the padding.
+            // Just let HomeScreen fill the available space inside the NavHost.
+            HomeScreen(modifier = Modifier.fillMaxSize())
+        }
     }
 }

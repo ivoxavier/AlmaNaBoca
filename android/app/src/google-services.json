@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "285348861324",
+    "project_id": "almanaboca",
+    "storage_bucket": "almanaboca.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:285348861324:android:4e5423b4c6a720de2df2a9",
+        "android_client_info": {
+          "package_name": "com.ixsvf.almanaboca"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_2gIgNH6wXFBuAZmS8lPm2jI5CnRqqH0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

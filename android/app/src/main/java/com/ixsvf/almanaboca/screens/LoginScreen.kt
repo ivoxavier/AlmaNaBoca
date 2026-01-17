@@ -25,46 +25,60 @@ import com.ixsvf.almanaboca.screens.components.TopPageText
 import com.ixsvf.almanaboca.ui.theme.states.LoginUiState
 
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier,
-                uiState: LoginUiState,
-                onLoginClick: (String, String) -> Unit) {
-
+fun LoginScreen(
+    modifier: Modifier = Modifier,
+    uiState: LoginUiState,
+    onLoginClick: (String, String) -> Unit // Callback para devolver os dados
+) {
+    // Estado local para gerir o texto enquanto o utilizador digita
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         TopPageText(label = stringResource(R.string.lbl_welcome))
-
         BlankSpace(4)
-
         TopPageText(label = stringResource(R.string.app_name))
-
         BlankSpace(4)
+        SummaryTopPageText(label = stringResource(id = R.string.lbl_login_to_account))
+        BlankSpace(16)
 
-        SummaryTopPageText(label=stringResource(id=R.string.lbl_login_to_account))
+        // CAMPO EMAIL
+        OutlinedTextComponent(
+            value = email,
+            onValueChange = { email = it }, // Atualiza a variável local
+            label = stringResource(R.string.lbl_account),
+            singleLine = true // Verifique se o seu componente usa 'isEmail' ou 'singleLine'
+        )
 
         BlankSpace(16)
 
-        OutlinedTextComponent(loginValue,{loginViewModel.onLoginChanged(it)},label = stringResource(R.string.lbl_account), true)
+        // CAMPO PASSWORD
+        OutlinedTextComponent(
+            value = password,
+            onValueChange = { password = it }, // Atualiza a variável local
+            label = stringResource(R.string.lbl_password),
+            singleLine = true // Verifique se o seu componente usa 'isEmail' ou 'singleLine'
+        )
 
         BlankSpace(16)
 
-        OutlinedTextComponent(passwordValue,{loginViewModel.onPasswordChanged(it)},label = stringResource(R.string.lbl_password), false)
+        Box(contentAlignment = Alignment.Center) {
+            LoginButton(
+                label = stringResource(R.string.btn_login),
+                onClick = {
+                    if (uiState !is LoginUiState.Loading) {
+                        // Envia os dados locais para o ViewModel via callback
+                        onLoginClick(email, password)
+                    }
+                },
+                enabled = uiState !is LoginUiState.Loading
+            )
 
-        BlankSpace(16)
-
-        Box(contentAlignment = Alignment.Center){
-            LoginButton(label = stringResource(R.string.btn_login), onClick = {
-                if(loginState !is LoginUiState.Loading){
-                    loginViewModel.performLogin()
-                }
-            }, enabled = loginState !is LoginUiState.Loading)
-
-            if (loginState is LoginUiState.Loading){
+            if (uiState is LoginUiState.Loading) {
                 CircularProgressIndicator(modifier = Modifier.size(32.dp))
             }
         }

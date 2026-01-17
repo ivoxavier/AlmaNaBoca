@@ -1,5 +1,16 @@
 <resources>
     <string name="app_name">Alma Na Boca</string>
     <string name="lbl_btbar_home">Home</string>
+    <string name="lbl_btbar_meditation">Meditation</string>
+    <string name="lbl_btbar_booking">Booking</string>
+    <string name="btn_login">Login</string>
+    <string name="lbl_login_to_account">Login into Your Account</string>
+    <string name="lbl_lost_password">Lost Password</string>
+    <string name="lbl_account">Account</string>
+    <string name="lbl_password">Password</string>
     <string name="lbl_welcome">Welcome</string>
+    <string name="lbl_coach_programs_available">Coach Programs Available</string>
+    <string name="lbl_meditations_circles">Meditations</string>
+    <string name="lbl_meditations_in_group">In Group</string>
+    <string name="lbl_find_me">Find Me</string>
 </resources>

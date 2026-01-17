@@ -60,6 +60,8 @@ dependencies {
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.ui)
+    implementation(libs.ui)
 
     testImplementation(libs.junit)
 
@@ -88,4 +90,5 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.work.runtime.ktx)
+    implementation(libs.androidx.material.icons.extended)
 }

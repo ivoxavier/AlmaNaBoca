@@ -10,7 +10,8 @@ object AlmanaBocaConstants {
 
         object MENU_SCREEN{
             const val HOME = "home"
-            //const val MEDITATION = "meditations"
+            const val MEDITATION = "meditations"
+            const val BOOKING = "booking"
             //const val CONSULTATION = "consultations"
             //const val SHOP = "shop"
         }

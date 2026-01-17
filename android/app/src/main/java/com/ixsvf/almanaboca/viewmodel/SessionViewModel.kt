@@ -3,6 +3,7 @@ package com.ixsvf.almanaboca.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseUser // Importante
 import com.ixsvf.almanaboca.services.model.UserProfile
 import com.ixsvf.almanaboca.services.repository.UsersRepository
 import com.ixsvf.almanaboca.ui.theme.states.LoginUiState
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class SessionViewModel(application: Application): AndroidViewModel(application) {
+    // Inicializa o repositório
     private val usersRepository = UsersRepository(application)
 
     private val _uiState = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
@@ -26,16 +28,14 @@ class SessionViewModel(application: Application): AndroidViewModel(application) 
         viewModelScope.launch {
             _uiState.value = LoginUiState.Loading
             try {
-                // Tenta fazer login no Firebase
-
                 val cleanEmail = email.trim()
                 val cleanPassword = pass.trim()
 
-                // Faz o login
-                signInWithEmailAndPassword(cleanEmail, cleanPassword)
+                // --- CORREÇÃO AQUI ---
+                // 1. Chamar através do usersRepository
+                // 2. Atribuir o resultado à variável firebaseUser
+                val firebaseUser = usersRepository.signInWithEmailAndPassword(cleanEmail, cleanPassword)
 
-                // SUCESSO! Vamos atualizar o currentUser manualmente para a UI reagir
-                val firebaseUser =
                 if (firebaseUser != null) {
                     _currentUser.value = UserProfile(
                         id = firebaseUser.uid,
@@ -43,11 +43,13 @@ class SessionViewModel(application: Application): AndroidViewModel(application) 
                         email = firebaseUser.email ?: cleanEmail,
                         isActive = true
                     )
+                    // Sucesso: Volta ao estado Idle (a navegação observará o currentUser)
+                    _uiState.value = LoginUiState.Idle
+                } else {
+                    _uiState.value = LoginUiState.Error("Login falhou: Utilizador nulo.")
                 }
-
-                // Se sucesso, atualiza estado (a navegação vai reagir ao currentUser, não necessita de estado Success aqui)
-                _uiState.value = LoginUiState.Idle
             } catch (e: Exception) {
+                // Captura erros do Firebase (senha errada, user não existe, etc)
                 _uiState.value = LoginUiState.Error(e.message ?: "Erro desconhecido")
             }
         }
