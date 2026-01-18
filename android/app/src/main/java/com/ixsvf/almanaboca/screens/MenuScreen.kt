@@ -16,7 +16,9 @@ import androidx.navigation.compose.rememberNavController
 import com.ixsvf.almanaboca.R
 import com.ixsvf.almanaboca.constants.AlmanaBocaConstants
 import com.ixsvf.almanaboca.screens.components.BottomNavigationBar
+import com.ixsvf.almanaboca.screens.menusubscreens.BookingScreen
 import com.ixsvf.almanaboca.screens.menusubscreens.HomeScreen
+import com.ixsvf.almanaboca.screens.menusubscreens.MeditationsScreen
 import com.ixsvf.almanaboca.viewmodel.SessionViewModel
 
 
@@ -29,6 +31,12 @@ sealed class BottomBarScreen(
         AlmanaBocaConstants.NAVIGATION_ROUTES.MENU_SCREEN.MEDITATION,
         R.string.lbl_btbar_meditation,
         R.drawable.ic_meditation
+    )
+
+    object Home: BottomBarScreen(
+        AlmanaBocaConstants.NAVIGATION_ROUTES.MENU_SCREEN.HOME,
+        R.string.lbl_btbar_home,
+        R.drawable.ic_home
     )
 
     object Booking : BottomBarScreen(
@@ -67,10 +75,16 @@ fun MenuNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = BottomBarScreen.Meditations.route,
+        startDestination = BottomBarScreen.Home.route,
         modifier = modifier // 1. The NavHost applies the Scaffold padding here
     ) {
         composable(route = BottomBarScreen.Meditations.route) {
+            // 2. Do NOT pass 'modifier' here. The NavHost already handled the padding.
+            // Just let HomeScreen fill the available space inside the NavHost.
+            MeditationsScreen(modifier = Modifier.fillMaxSize())
+        }
+
+        composable(route = BottomBarScreen.Home.route) {
             // 2. Do NOT pass 'modifier' here. The NavHost already handled the padding.
             // Just let HomeScreen fill the available space inside the NavHost.
             HomeScreen(modifier = Modifier.fillMaxSize())
@@ -79,7 +93,7 @@ fun MenuNavHost(
         composable(route = BottomBarScreen.Booking.route) {
             // 2. Do NOT pass 'modifier' here. The NavHost already handled the padding.
             // Just let HomeScreen fill the available space inside the NavHost.
-            HomeScreen(modifier = Modifier.fillMaxSize())
+            BookingScreen(modifier = Modifier.fillMaxSize())
         }
     }
 }

@@ -34,16 +34,10 @@ import com.ixsvf.almanaboca.screens.BottomBarScreen
 @Composable
 fun BottomNavigationBar(navController: NavController) {
 
-    // NOTA: Para este design funcionar com um botão no meio,
-    // precisas de um elemento "falso" na lista para ocupar o espaço do meio
-    // ou usar uma lógica de layout diferente.
-    // Aqui vou assumir que queres adicionar itens reais futuramente.
-
     val screens = listOf(
-        BottomBarScreen.Meditations,
-        // Adiciona um null para representar o espaço do botão flutuante
-        null,
-         BottomBarScreen.Booking, // Exemplo de outro ecrã
+        BottomBarScreen.Meditations, // Item da esquerda
+        null,                        // Item do MEIO (null cria o espaço para o botão Home)
+        BottomBarScreen.Booking      // Item da direita
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -52,25 +46,27 @@ fun BottomNavigationBar(navController: NavController) {
     Box(
         modifier = Modifier.fillMaxWidth()
     ) {
-        // 1. A Barra de Navegação
+        // 1. A Barra de Navegação (Fundo)
         NavigationBar(
             modifier = Modifier
                 .height(80.dp)
                 .align(Alignment.BottomCenter),
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.surface,
+            tonalElevation = 8.dp
         ) {
             screens.forEach { screen ->
                 if (screen == null) {
-                    // 2. O Espaço Vazio (onde fica o botão flutuante)
+                    // 2. O Espaço Vazio
+                    // Cria um item invisível e desativado para empurrar os outros
                     NavigationBarItem(
                         selected = false,
                         onClick = { },
                         icon = { },
                         enabled = false,
-                        label = { Text("") } // Ocupa espaço mas é invisível
+                        label = { Text("") }
                     )
                 } else {
-                    // 3. Os Itens Reais
+                    // 3. Os Itens Reais (Esquerda e Direita)
                     val isSelected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
 
                     NavigationBarItem(
@@ -107,23 +103,30 @@ fun BottomNavigationBar(navController: NavController) {
             }
         }
 
-        // 4. O Botão Flutuante (FAB)
+        // 4. O Botão Flutuante (HOME)
         FloatingActionButton(
-            onClick = { /* Ação do botão central */ },
+            onClick = {
+                // AÇÃO DE NAVEGAÇÃO PARA A HOME
+                navController.navigate(BottomBarScreen.Home.route) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            },
             shape = CircleShape,
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = Color.White,
             elevation = FloatingActionButtonDefaults.elevation(8.dp),
-            // Ajusta este offset para subir o botão um pouco acima da barra
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .offset(y = (-30).dp)
+                .offset(y = (-30).dp) // Sobe o botão
                 .size(60.dp)
         ) {
-            // CORREÇÃO DO ÍCONE AQUI:
             Icon(
-                painter = painterResource(id = R.drawable.ic_home), // Usa painterResource
-                contentDescription = "Botão Central",
+                painter = painterResource(id = R.drawable.ic_home),
+                contentDescription = "Home",
                 modifier = Modifier.size(30.dp)
             )
         }
