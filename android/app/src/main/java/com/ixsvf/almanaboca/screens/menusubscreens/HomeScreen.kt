@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ixsvf.almanaboca.R
 import com.ixsvf.almanaboca.screens.components.AlmanaBocaLogo
+import com.ixsvf.almanaboca.screens.components.PaddingBox
 import com.ixsvf.almanaboca.screens.components.SummaryTopPageText
 import com.ixsvf.almanaboca.services.model.HomeItem
 import com.ixsvf.almanaboca.ui.theme.states.HomeUiState
@@ -238,12 +239,6 @@ fun SpotifyButton(spotifyUrl: String) {
 
 // --- COMPONENTES EXISTENTES (MANTIDOS) ---
 
-@Composable
-fun PaddingBox(content: @Composable () -> Unit) {
-    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-        content()
-    }
-}
 
 @Composable
 fun ProgramCarouselCard(item: HomeItem) {

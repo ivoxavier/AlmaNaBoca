@@ -10,6 +10,8 @@
     <string name="lbl_password">Password</string>
     <string name="lbl_welcome">Welcome</string>
     <string name="lbl_coach_programs_available">Coach Programs Available</string>
+    <string name="lbl_my_bookings">My Bookings</string>
+    <string name="lbl_new_booking">New Bookings</string>
     <string name="lbl_meditations_circles">Meditations</string>
     <string name="lbl_meditations_in_group">In Group</string>
     <string name="lbl_find_me">Find Me</string>
