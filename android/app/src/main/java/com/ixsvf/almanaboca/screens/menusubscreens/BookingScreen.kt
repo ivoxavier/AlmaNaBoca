@@ -4,7 +4,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -32,9 +31,6 @@ import com.ixsvf.almanaboca.screens.components.PaddingBox
 import com.ixsvf.almanaboca.screens.components.SummaryTopPageText
 import com.ixsvf.almanaboca.ui.theme.states.HomeUiState
 import com.ixsvf.almanaboca.viewmodel.BookingViewModel
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 // --- Cores ---
 private val CardWhite = Color.White
@@ -44,7 +40,7 @@ private val StatusConfirmedBg = Color(0xFFE8F5E9)
 private val StatusConfirmedText = Color(0xFF2E7D32)
 private val StatusPendingBg = Color(0xFFFFF3E0)
 private val StatusPendingText = Color(0xFFEF6C00)
-private val DeleteRed = Color(0xFFD32F2F) // Cor para o botão cancelar
+private val DeleteRed = Color(0xFFD32F2F)
 
 // --- Modelo de Dados ---
 data class BookingItem(
@@ -69,8 +65,7 @@ fun BookingScreen(
     var showDatePicker by remember { mutableStateOf(false) }
     var selectedDateMillis by remember { mutableStateOf<Long?>(null) }
 
-    // --- DADOS FICTÍCIOS (Tornamos a lista mutável para simular a remoção na UI) ---
-    // Nota: Numa app real, a remoção deve ser feita no ViewModel e reagir ao State
+    // --- DADOS FICTÍCIOS ---
     val dummyBookings = remember {
         mutableStateListOf(
             BookingItem("1", "Sessão de Coaching Executivo", "12 Fev 2026", "14:30", BookingStatus.CONFIRMED),
@@ -112,7 +107,6 @@ fun BookingScreen(
                 }
                 is HomeUiState.Success -> {
                     Column(modifier = Modifier.verticalScroll(scrollState)) {
-
                         Column(
                             modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
                             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -121,32 +115,14 @@ fun BookingScreen(
                                 SummaryTopPageText(stringResource(R.string.lbl_my_bookings))
                             }
 
-                            if (dummyBookings.isEmpty()) {
-                                PaddingBox {
-                                    Card(
-                                        colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
-                                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-                                    ) {
-                                        Text(
-                                            text = "Ainda não tens marcações agendadas.",
-                                            modifier = Modifier.padding(16.dp),
-                                            color = TextGray
-                                        )
+                            // --- Card Único Agrupado ---
+                            PaddingBox {
+                                BookingGroupCard(
+                                    bookings = dummyBookings,
+                                    onCancelBooking = { bookingToRemove ->
+                                        dummyBookings.remove(bookingToRemove)
                                     }
-                                }
-                            } else {
-                                dummyBookings.forEach { booking ->
-                                    PaddingBox {
-                                        BookingCard(
-                                            booking = booking,
-                                            onCancel = {
-                                                // Lógica de cancelamento
-                                                // Numa app real: viewModel.cancelBooking(booking.id)
-                                                dummyBookings.remove(booking)
-                                            }
-                                        )
-                                    }
-                                }
+                                )
                             }
 
                             Spacer(modifier = Modifier.height(100.dp))
@@ -170,6 +146,144 @@ fun BookingScreen(
         )
     }
 }
+
+// --- COMPONENTE GROUP CARD (Card Único para a Lista) ---
+@Composable
+fun BookingGroupCard(
+    bookings: List<BookingItem>,
+    onCancelBooking: (BookingItem) -> Unit
+) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        if (bookings.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(32.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Ainda não tens marcações agendadas.",
+                    color = TextGray,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        } else {
+            Column {
+                bookings.forEachIndexed { index, booking ->
+                    BookingRowItem(
+                        booking = booking,
+                        onCancel = { onCancelBooking(booking) }
+                    )
+
+                    // Adiciona divisória apenas se NÃO for o último item
+                    if (index < bookings.lastIndex) {
+                        HorizontalDivider(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            color = Color.LightGray.copy(alpha = 0.3f)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+// --- ITEM INDIVIDUAL DA LISTA (Sem Card, apenas Row com lógica de clique) ---
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun BookingRowItem(
+    booking: BookingItem,
+    onCancel: () -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val haptics = LocalHapticFeedback.current
+
+    Box {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    onClick = {
+                        // Clique normal (navegação ou detalhes)
+                    },
+                    onLongClick = {
+                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                        expanded = true
+                    }
+                )
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Text(
+                    text = booking.serviceName,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = TextDark,
+                    modifier = Modifier.weight(1f)
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                StatusBadge(status = booking.status)
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                BookingInfoItem(
+                    icon = Icons.Outlined.CalendarMonth,
+                    text = booking.date
+                )
+
+                Spacer(modifier = Modifier.width(24.dp))
+
+                BookingInfoItem(
+                    icon = Icons.Filled.Schedule,
+                    text = booking.time
+                )
+            }
+        }
+
+        // Menu Dropdown
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            offset = DpOffset(x = 16.dp, y = 0.dp),
+            containerColor = CardWhite
+        ) {
+            DropdownMenuItem(
+                text = {
+                    Text("Cancelar Marcação", color = DeleteRed, fontWeight = FontWeight.Bold)
+                },
+                onClick = {
+                    expanded = false
+                    onCancel()
+                },
+                leadingIcon = {
+                    Icon(
+                        Icons.Outlined.Delete,
+                        contentDescription = null,
+                        tint = DeleteRed
+                    )
+                }
+            )
+        }
+    }
+}
+
+// --- COMPONENTES AUXILIARES ---
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -202,110 +316,6 @@ fun DatePickerModal(
         }
     ) {
         DatePicker(state = datePickerState)
-    }
-}
-
-// --- COMPONENTE CARD DE MARCAÇÃO COM LONG PRESS ---
-@OptIn(ExperimentalFoundationApi::class) // Necessário para combinedClickable
-@Composable
-fun BookingCard(
-    booking: BookingItem,
-    onCancel: () -> Unit // Callback para quando o user clica em cancelar
-) {
-    // Estado para controlar se o menu está visível
-    var expanded by remember { mutableStateOf(false) }
-
-    // Para vibração tátil
-    val haptics = LocalHapticFeedback.current
-
-    Box {
-        Card(
-            colors = CardDefaults.cardColors(containerColor = CardWhite),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-                // MODIFICADOR MÁGICO PARA LONG PRESS
-                .combinedClickable(
-                    onClick = {
-                        // Clique normal (pode abrir detalhes se quiseres)
-                    },
-                    onLongClick = {
-                        haptics.performHapticFeedback(HapticFeedbackType.LongPress) // Vibra
-                        expanded = true // Abre o menu
-                    }
-                )
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Top
-                ) {
-                    Text(
-                        text = booking.serviceName,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = TextDark,
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    StatusBadge(status = booking.status)
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    BookingInfoItem(
-                        icon = Icons.Outlined.CalendarMonth,
-                        text = booking.date
-                    )
-
-                    Spacer(modifier = Modifier.width(24.dp))
-
-                    BookingInfoItem(
-                        icon = Icons.Filled.Schedule,
-                        text = booking.time
-                    )
-                }
-            }
-        }
-
-        // MENU POPUP (Aparece em cima do card ou próximo do toque)
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            offset = DpOffset(x = 16.dp, y = 0.dp)
-        ) {
-            DropdownMenuItem(
-                text = {
-                    Text("Cancelar Marcação", color = DeleteRed, fontWeight = FontWeight.Bold)
-                },
-                onClick = {
-                    expanded = false
-                    onCancel()
-                },
-                leadingIcon = {
-                    Icon(
-                        Icons.Outlined.Delete,
-                        contentDescription = null,
-                        tint = DeleteRed
-                    )
-                }
-            )
-        }
     }
 }
 
