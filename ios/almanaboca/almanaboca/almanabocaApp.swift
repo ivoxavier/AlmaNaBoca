@@ -11,7 +11,8 @@ import SwiftUI
 struct almanabocaApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            // Substituímos o ContentView() pela nossa estrutura de navegação
+            AlmanaBocaNavigation()
         }
     }
 }
