@@ -27,7 +27,7 @@ struct AlmanaBocaNavigation: View {
                 // Aqui estou a passar o método de login via closure para manter desacoplado
                 uiState: sessionViewModel.uiState,
                 onLoginClick: { email, password in
-                    sessionViewModel.login(email: email, password: password)
+                    sessionViewModel.login(email: email, pass: password)
                     
                     // Navegar para o Menu
                     navigationPath.append(Screen.menu)

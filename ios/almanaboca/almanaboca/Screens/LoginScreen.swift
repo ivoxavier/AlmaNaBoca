@@ -10,11 +10,9 @@ extension Color {
     static let brandRed = Color(red: 158/255, green: 25/255, blue: 25/255)
 }
 
-// ⚠️ APAGUEI O ENUM DAQUI PORQUE JÁ EXISTE NO OUTRO FICHEIRO
-
 struct LoginScreen: View {
     // Parâmetros recebidos
-    var uiState: LoginUiState // Agora usa o Enum definido no outro ficheiro
+    var uiState: LoginUiState
     var onLoginClick: (String, String) -> Void
 
     // Estados locais
@@ -41,14 +39,29 @@ struct LoginScreen: View {
             if !isSplashFinished {
                 // --- FASE 1: SPLASH ---
                 VStack {
-                    Image(systemName: "fork.knife.circle.fill")
+                    // MUDANÇA 1: Usar a tua imagem "AppLogo"
+                    // Se o teu logo for branco transparente, usa assim:
+                    /*Image("AppIcon")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 150, height: 150)
                         .padding(32)
+                    */
+                    // DICA: Se o teu logo for preto ou colorido e quiseres forçar a ficar BRANCO
+                    //   para combinar com o fundo vermelho, usa este código em vez do de cima:
+                     
+                    Image("AppLogo")
+                        .renderingMode(.template) // Permite mudar a cor
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 280, height: 280)
+                        //.foregroundColor(.white) // Pinta de branco
+                        .padding(32)
+                
                 }
                 .transition(.opacity)
-            } else {
+            }
+            else {
                 // --- FASE 2: LOGIN ---
                 VStack(spacing: 0) {
                     
@@ -58,10 +71,12 @@ struct LoginScreen: View {
                     
                     Spacer().frame(height: 16)
                     
-                    Image(systemName: "fork.knife")
+                    // MUDANÇA 2: O Logo mais pequeno no topo do formulário
+                    Image("AppLogo")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(height: 80)
+                        .frame(height: 200)
+                        // .foregroundColor(.white) // Descomenta se precisares de forçar a cor branca
                     
                     // --- ÁREA ANIMADA ---
                     if showFormAnimation {
@@ -138,37 +153,37 @@ struct LoginScreen: View {
 // MARK: - Componentes Auxiliares
 
 struct CustomTextField: View {
-    @Binding var text: String
-    var label: String
-    var isSecure: Bool
-    
+  @Binding var text: String
+  var label: String
+  var isSecure: Bool
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(label)
-                .font(.caption)
-                .fontWeight(.semibold)
-            
-            if isSecure {
-                SecureField("", text: $text)
-                    .padding()
-                    .background(Color.white.opacity(0.2))
-                    .cornerRadius(8)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.white, lineWidth: 1)
-                    )
-            } else {
-                TextField("", text: $text)
-                    .padding()
-                    .background(Color.white.opacity(0.2))
-                    .cornerRadius(8)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
+                            .font(.caption)
+                            .fontWeight(
+                            .semibold)
+                                if isSecure {
+                                    SecureField("", text: $text)
+                                    .padding()
+                                    .background(Color.white.opacity(0.2))
+                                    .cornerRadius(8)
+                                    .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                            .stroke(Color.white, lineWidth: 1)
+                        )
+                            } else {
+                            TextField("", text: $text)
+                            .padding()
+                            .background(Color.white.opacity(0.2))
+                            .cornerRadius(8)
+                            .overlay(
+                            RoundedRectangle(cornerRadius: 8)
                             .stroke(Color.white, lineWidth: 1)
                     )
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled(true)
-            }
+                }
         }
     }
 }
@@ -177,6 +192,6 @@ struct CustomTextField: View {
 struct LoginScreen_Previews: PreviewProvider {
     static var previews: some View {
         // CORREÇÃO AQUI: Passar o Enum .idle em vez da String "Idle"
-        LoginScreen(uiState: .idle, onLoginClick: { _, _ in })
-    }
+    LoginScreen(uiState: .idle, onLoginClick: { _, _ in })
+ }
 }

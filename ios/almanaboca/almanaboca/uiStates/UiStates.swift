@@ -1,13 +1,6 @@
 import Foundation
 
-// MARK: - Models
-// Criei este Stub para o código compilar, pois o HomeUiState depende dele.
-// Substitui pelos campos reais do teu 'HomeItem.kt' quando o tiveres.
-struct HomeItem: Identifiable, Hashable, Codable {
-    var id: String
-    var title: String
-    // Adiciona outros campos aqui...
-}
+
 
 // MARK: - UI States
 
