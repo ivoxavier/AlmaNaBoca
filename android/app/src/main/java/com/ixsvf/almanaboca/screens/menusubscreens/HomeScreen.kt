@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -204,19 +205,70 @@ fun DetailRowSmall(icon: ImageVector, text: String) {
     }
 }
 @Composable
-fun SocialMediaCard(instagramUrl: String, facebookUrl: String, youtubeUrl: String) {
+fun SocialMediaCard(
+    instagramUrl: String,
+    facebookUrl: String,
+    youtubeUrl: String
+) {
     val uriHandler = LocalUriHandler.current
-    Card(colors = CardDefaults.cardColors(containerColor = CardWhite), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp), shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) {
-        Row(modifier = Modifier.fillMaxWidth().padding(24.dp), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
-            SocialIconItem(Icons.Default.Link, "Instagram", { uriHandler.openUri(instagramUrl) }, Color(0xFFE1306C))
-            SocialIconItem(Icons.Default.Link, "Facebook", { uriHandler.openUri(facebookUrl) }, Color(0xFF1877F2))
-            SocialIconItem(Icons.Default.Link, "YouTube", { uriHandler.openUri(youtubeUrl) }, Color(0xFFFF0000))
+
+    Card(
+        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Instagram
+            SocialIconItem(
+                iconRes = R.drawable.ic_instagram, // Substitua pelo nome exato do seu ficheiro
+                contentDescription = "Instagram",
+                onClick = { uriHandler.openUri(instagramUrl) },
+                tint = Color(0xFFE1306C)
+            )
+
+            // Facebook
+            SocialIconItem(
+                iconRes = R.drawable.ic_facebook, // O ficheiro que mencionou
+                contentDescription = "Facebook",
+                onClick = { uriHandler.openUri(facebookUrl) },
+                tint = Color(0xFF1877F2)
+            )
+
+            // YouTube
+            SocialIconItem(
+                iconRes = R.drawable.ic_youtube, // Substitua pelo nome exato do seu ficheiro
+                contentDescription = "YouTube",
+                onClick = { uriHandler.openUri(youtubeUrl) },
+                tint = Color(0xFFFF0000)
+            )
         }
     }
 }
 @Composable
-fun SocialIconItem(icon: ImageVector, contentDescription: String, onClick: () -> Unit, tint: Color) {
-    IconButton(onClick = onClick, modifier = Modifier.size(48.dp)) { Icon(icon, contentDescription, modifier = Modifier.size(32.dp), tint = tint) }
+fun SocialIconItem(
+    iconRes: Int, // MUDANÇA: Agora recebe o ID do drawable (Int)
+    contentDescription: String,
+    onClick: () -> Unit,
+    tint: Color
+) {
+    IconButton(
+        onClick = onClick,
+        modifier = Modifier.size(48.dp)
+    ) {
+        Icon(
+            painter = painterResource(id = iconRes), // MUDANÇA: Usa painterResource para ler o XML
+            contentDescription = contentDescription,
+            modifier = Modifier.size(24.dp), // Ajuste o tamanho se necessário (ex: 24.dp ou 32.dp)
+            tint = tint
+        )
+    }
 }
 @Composable
 fun SpotifyButton(spotifyUrl: String) {
