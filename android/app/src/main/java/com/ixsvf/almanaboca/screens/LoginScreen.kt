@@ -90,10 +90,6 @@ fun LoginScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    TopPageText(label = stringResource(R.string.lbl_welcome))
-
-                    BlankSpace(16)
-
                     AlmanaBocaLogo(
                         containerColor = Color.Transparent,
                         elevation = 0.dp
