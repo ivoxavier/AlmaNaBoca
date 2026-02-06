@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ixsvf.almanaboca.R
 import com.ixsvf.almanaboca.screens.components.AlmanaBocaLogo
+import com.ixsvf.almanaboca.screens.components.MartaBanner
 import com.ixsvf.almanaboca.screens.components.PaddingBox
 import com.ixsvf.almanaboca.screens.components.SummaryTopPageText
 import com.ixsvf.almanaboca.services.model.HomeItem
@@ -114,6 +115,13 @@ fun HomeScreen(
 
                         // --- RODAPÉ ---
                         PaddingBox { SummaryTopPageText(stringResource(R.string.lbl_find_me)) }
+
+                        MartaBanner()
+
+                        PaddingBox{
+
+                        }
+
                         PaddingBox {
                             SocialMediaCard(
                                 "https://instagram.com/almanaboca",
