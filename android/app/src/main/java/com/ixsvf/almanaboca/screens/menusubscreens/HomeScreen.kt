@@ -74,10 +74,7 @@ fun HomeScreen(
                     AlmanaBocaLogo()
 
                     // --- SEPARAÇÃO DOS DADOS ---
-                    // 1. Cursos: Tudo o que tem 'coachProgram' preenchido
                     val coachingItems = state.courses.filter { it.coachProgram.isNotEmpty() }
-
-                    // 2. Meditação: O item que tem 'meditationCirclesType' preenchido (vindo da raiz)
                     val meditationItem = state.courses.find { it.meditationCirclesType.isNotEmpty() }
 
                     Column(
@@ -113,22 +110,47 @@ fun HomeScreen(
 
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        // --- RODAPÉ ---
-                        PaddingBox { SummaryTopPageText(stringResource(R.string.lbl_find_me)) }
-
-                        MartaBanner()
-
-                        PaddingBox{
-
-                        }
+                        // --- RODAPÉ (Sobre Mim) ---
+                        PaddingBox { SummaryTopPageText(stringResource(R.string.lbl_about_me)) }
 
                         PaddingBox {
-                            SocialMediaCard(
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Start
+                            ) {
+                                MartaBanner(size = 110.dp)
+                                Spacer(modifier = Modifier.width(16.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "Olá, eu sou a Marta!",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = TextDark
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = "A minha missão é ajudar-te a encontrar a tua voz e o teu equilíbrio...",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = TextGray,
+                                        lineHeight = 18.sp,
+                                        maxLines = 5,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+                            }
+                        }
+
+                        // --- Redes Sociais (Agora sem Card) ---
+                        // Remover PaddingBox se quiser menos espaço, ou manter para consistência
+                        PaddingBox {
+                            SocialMediaIconsRow(
                                 "https://instagram.com/almanaboca",
                                 "https://facebook.com/almanaboca",
                                 "https://youtube.com/@almanaboca"
                             )
                         }
+
                         PaddingBox { SpotifyButton("https://open.spotify.com/show/trupodcast") }
                         Spacer(modifier = Modifier.height(100.dp))
                     }
@@ -137,6 +159,8 @@ fun HomeScreen(
         }
     }
 }
+
+// --- COMPONENTES UI ---
 
 @Composable
 fun ProgramCarouselCard(item: HomeItem) {
@@ -181,12 +205,9 @@ fun MeditationCircleCard(item: HomeItem) {
         modifier = Modifier.fillMaxWidth().wrapContentHeight()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // TÍTULO DA MEDITAÇÃO (Lido da Raiz)
             Text(item.meditationCirclesType.ifEmpty { stringResource(R.string.lbl_meditations_in_group) }, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = TextDark)
-
             Spacer(modifier = Modifier.height(8.dp))
             Text(item.meditationCirclesDesc.ifEmpty { stringResource(R.string.lbl_meditations_join_us) }, style = MaterialTheme.typography.bodySmall, color = TextGray)
-
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
             Spacer(modifier = Modifier.height(12.dp))
@@ -203,7 +224,6 @@ fun MeditationCircleCard(item: HomeItem) {
     }
 }
 
-// Componentes Auxiliares (Iguais)
 @Composable
 fun DetailRowSmall(icon: ImageVector, text: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -212,72 +232,46 @@ fun DetailRowSmall(icon: ImageVector, text: String) {
         Text(text, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = TextDark)
     }
 }
+
+// MUDANÇA AQUI: Removido o Card, agora é apenas uma Row
 @Composable
-fun SocialMediaCard(
+fun SocialMediaIconsRow(
     instagramUrl: String,
     facebookUrl: String,
     youtubeUrl: String
 ) {
     val uriHandler = LocalUriHandler.current
 
-    Card(
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth()
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp), // Padding vertical para afastar um pouco
+        horizontalArrangement = Arrangement.SpaceEvenly, // Ícones espaçados igualmente
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Instagram
-            SocialIconItem(
-                iconRes = R.drawable.ic_instagram, // Substitua pelo nome exato do seu ficheiro
-                contentDescription = "Instagram",
-                onClick = { uriHandler.openUri(instagramUrl) },
-                tint = Color(0xFFE1306C)
-            )
-
-            // Facebook
-            SocialIconItem(
-                iconRes = R.drawable.ic_facebook, // O ficheiro que mencionou
-                contentDescription = "Facebook",
-                onClick = { uriHandler.openUri(facebookUrl) },
-                tint = Color(0xFF1877F2)
-            )
-
-            // YouTube
-            SocialIconItem(
-                iconRes = R.drawable.ic_youtube, // Substitua pelo nome exato do seu ficheiro
-                contentDescription = "YouTube",
-                onClick = { uriHandler.openUri(youtubeUrl) },
-                tint = Color(0xFFFF0000)
-            )
-        }
+        SocialIconItem(R.drawable.ic_instagram, "Instagram", { uriHandler.openUri(instagramUrl) }, Color(0xFFE1306C))
+        SocialIconItem(R.drawable.ic_facebook, "Facebook", { uriHandler.openUri(facebookUrl) }, Color(0xFF1877F2))
+        SocialIconItem(R.drawable.ic_youtube, "YouTube", { uriHandler.openUri(youtubeUrl) }, Color(0xFFFF0000))
     }
 }
+
 @Composable
 fun SocialIconItem(
-    iconRes: Int, // MUDANÇA: Agora recebe o ID do drawable (Int)
+    iconRes: Int,
     contentDescription: String,
     onClick: () -> Unit,
     tint: Color
 ) {
-    IconButton(
-        onClick = onClick,
-        modifier = Modifier.size(48.dp)
-    ) {
+    IconButton(onClick = onClick, modifier = Modifier.size(48.dp)) {
         Icon(
-            painter = painterResource(id = iconRes), // MUDANÇA: Usa painterResource para ler o XML
+            painter = painterResource(id = iconRes),
             contentDescription = contentDescription,
-            modifier = Modifier.size(24.dp), // Ajuste o tamanho se necessário (ex: 24.dp ou 32.dp)
+            modifier = Modifier.size(32.dp), // Ícone um pouco maior já que não tem card
             tint = tint
         )
     }
 }
+
 @Composable
 fun SpotifyButton(spotifyUrl: String) {
     val uriHandler = LocalUriHandler.current

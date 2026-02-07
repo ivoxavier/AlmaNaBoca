@@ -20,5 +20,6 @@
     <string name="lbl_meditations_join_us">Join our meditations circles to reach your balance.</string>
     <string name="lbl_meditations_type">Phisically</string>
     <string name="lbl_find_me">Find Me</string>
+    <string name="lbl_about_me">About Me</string>
     <string name="lbl_error_triggered">An error occurred</string>
 </resources>

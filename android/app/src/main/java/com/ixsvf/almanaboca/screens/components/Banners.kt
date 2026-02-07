@@ -28,8 +28,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.ixsvf.almanaboca.R
 import com.ixsvf.almanaboca.ui.theme.logos.Logos
 
 // 1. Função auxiliar para carregar o Bitmap (evita duplicar código)
@@ -117,38 +119,22 @@ fun AlmanaBocaLogo(
 @Composable
 fun MartaBanner(
     modifier: Modifier = Modifier,
-    size: Dp = 150.dp, // Tamanho do círculo (diâmetro)
+    size: Dp = 150.dp,
     elevation: Dp = 4.dp,
-    containerColor: Color = MaterialTheme.colorScheme.surfaceVariant
+    // MUDANÇA 1: Definir a cor padrão como Transparent para não pintar o fundo
+    containerColor: Color = Color.Transparent
 ) {
-    val martaBitmap = rememberMartaBannerBitmap()
-
-    // Surface é ótimo aqui porque lida com o Shape (corte), a Sombra (elevation) e o fundo
     Surface(
-        modifier = modifier.size(size), // Define o tamanho total do componente
-        shape = CircleShape,            // Corta tudo o que estiver dentro em forma de círculo
-        color = containerColor,
+        modifier = modifier.size(size),
+        shape = CircleShape,
+        color = containerColor, // O Surface agora é transparente
         shadowElevation = elevation
     ) {
-        if (martaBitmap != null) {
-            Image(
-                bitmap = martaBitmap,
-                contentDescription = "Foto da Marta",
-                // ContentScale.Crop é CRUCIAL: garante que a imagem preenche o círculo
-                // sem distorcer, cortando as bordas se necessário.
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-        } else {
-            // Fallback caso a imagem B64 falhe
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = Icons.Default.BrokenImage,
-                    contentDescription = "Erro na imagem",
-                    modifier = Modifier.size(32.dp),
-                    tint = MaterialTheme.colorScheme.error
-                )
-            }
-        }
+        Image(
+            painter = painterResource(id = R.drawable.marta),
+            contentDescription = "Foto da Marta",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
     }
 }
