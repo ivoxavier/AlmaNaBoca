@@ -1,10 +1,8 @@
 package com.ixsvf.almanaboca.services.model
 
-import com.google.firebase.firestore.PropertyName
-
 data class HomeItem(
     val id: String = "",
-    // Campos do Curso (Coaching)
+    // Campos do Curso
     val coachName: String = "",
     val coachProgram: String = "",
     val whatToExpectProgram: String = "",
@@ -25,20 +23,10 @@ data class HomeItem(
     val podcastUrl: String = "",
     val registrationsUrl: String = "",
 
-    // Campos de Meditação (Lidos da Raiz)
+    // Campos de Meditação
     val meditationCirclesDesc: String = "",
     val meditationCirclesType: String = "",
     val meditationCirclesNextSession: String = "",
     val meditationCirclesLocation: String = "",
     val meditationCirclesPrice: Double = 0.0
-)
-
-// O Wrapper também usa Any? para não falhar na leitura da raiz
-data class HomeDocumentWrapper(
-    val courses: List<HomeItem> = emptyList(),
-    val meditationCirclesType: String = "",
-    val meditationCirclesDesc: String = "",
-    val meditationCirclesNextSession: String = "",
-    val meditationCirclesLocation: String = "",
-    val meditationCirclesPrice: Any? = null
 )

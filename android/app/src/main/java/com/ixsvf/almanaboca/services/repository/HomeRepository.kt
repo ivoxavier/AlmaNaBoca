@@ -8,7 +8,7 @@ import kotlinx.coroutines.tasks.await
 class HomeRepository {
 
     private val db = FirebaseFirestore.getInstance()
-    // Certifique-se que o ID do documento está correto
+    // ID confirmado pelo seu print
     private val docRef = db.collection("home_items").document("nkC4lOyD6jZSxBw1k37E")
 
     suspend fun getHomeItems(): List<HomeItem> {
@@ -18,38 +18,47 @@ class HomeRepository {
             if (snapshot.exists()) {
                 val listaFinal = mutableListOf<HomeItem>()
 
-                // --- 1. LER ARRAY DE CURSOS (Coaching) ---
-                // Lemos como uma lista genérica para não falhar
-                val rawCourses = snapshot.get("courses") as? List<Map<String, Any?>>
+                // --- 1. LER CURSOS (Versão Universal) ---
+                // Em vez de forçar List<Map>, pegamos o objeto genérico "Any"
+                val rawData = snapshot.get("courses")
 
-                rawCourses?.forEach { map ->
-                    try {
-                        val item = HomeItem(
-                            // Lê cada campo com segurança. Se não existir, põe vazio.
-                            coachProgram = map["coachProgram"] as? String ?: "",
-                            whatToExpectProgram = map["whatToExpectProgram"] as? String ?: "",
-                            coachStartDate = map["coachStartDate"]?.toString() ?: "", // Aceita qualquer formato
-                            coachDateEnd = map["coachDateEnd"]?.toString() ?: "",
+                // Verificamos se é uma lista (não importa do quê)
+                if (rawData is List<*>) {
+                    rawData.forEach { item ->
+                        // Verificamos se cada item se comporta como um Mapa
+                        if (item is Map<*, *>) {
+                            try {
+                                val homeItem = HomeItem(
+                                    // Conversões Seguras (ToString para textos)
+                                    coachProgram = item["coachProgram"]?.toString() ?: "",
+                                    whatToExpectProgram = item["whatToExpectProgram"]?.toString() ?: "",
+                                    coachStartDate = item["coachStartDate"]?.toString() ?: "",
+                                    coachDateEnd = item["coachDateEnd"]?.toString() ?: "",
 
-                            // Conversão Segura de Números (String ou Number -> Double/Int)
-                            coachDiscount = parseDouble(map["coachDiscount"]),
-                            coachVacancies = parseInt(map["coachVacancies"]),
+                                    // Conversões Seguras para Números
+                                    coachDiscount = parseDouble(item["coachDiscount"]),
+                                    coachVacancies = parseInt(item["coachVacancies"]),
+                                    coachPriceOption1 = parseDouble(item["coachPriceOption1"]),
+                                    coachPriceOption2 = parseDouble(item["coachPriceOption2"]),
 
-                            instagramUrl = map["instagramUrl"] as? String ?: ""
-                        )
-                        // Só adiciona se tiver nome do programa (para não mostrar vazios)
-                        if (item.coachProgram.isNotEmpty()) {
-                            listaFinal.add(item)
+                                    instagramUrl = item["instagramUrl"]?.toString() ?: ""
+                                )
+
+                                // Log para debug: Ver o que está a ser lido
+                                Log.d("FIREBASE_DEBUG", "Li o programa: ${homeItem.coachProgram}")
+
+                                if (homeItem.coachProgram.isNotEmpty()) {
+                                    listaFinal.add(homeItem)
+                                }
+                            } catch (e: Exception) {
+                                Log.e("FIREBASE_ERRO", "Falha ao ler item: ${e.message}")
+                            }
                         }
-                    } catch (e: Exception) {
-                        Log.e("FIREBASE", "Erro ao ler um curso específico: ${e.message}")
                     }
                 }
 
-                // --- 2. LER DADOS DA RAIZ (Meditação - Cartão Único) ---
+                // --- 2. LER MEDITAÇÃO ---
                 val medType = snapshot.getString("meditationCirclesType") ?: ""
-
-                // Se o campo meditationCirclesType existir na raiz, criamos o item
                 if (medType.isNotEmpty()) {
                     val medItem = HomeItem(
                         id = "meditacao_raiz",
@@ -60,31 +69,31 @@ class HomeRepository {
                         meditationCirclesPrice = parseDouble(snapshot.get("meditationCirclesPrice"))
                     )
                     listaFinal.add(medItem)
-                    Log.d("FIREBASE", "Meditação da raiz adicionada com sucesso.")
                 }
 
                 return listaFinal
             }
+            Log.e("FIREBASE_ERRO", "Documento não existe ou ID errado")
             emptyList()
         } catch (e: Exception) {
-            Log.e("FIREBASE_CRASH", "Erro fatal ao ler documento: ${e.message}")
+            Log.e("FIREBASE_CRASH", "Erro fatal: ${e.message}")
             e.printStackTrace()
             emptyList()
         }
     }
 
-    // --- Funções Auxiliares de Segurança ---
-    // Converte qualquer coisa (texto "20.5", número 20, vazio "") para Double
+    // --- FUNÇÕES QUE EVITAM CRASHES DE TIPO ---
     private fun parseDouble(value: Any?): Double {
+        if (value == null) return 0.0
         return when (value) {
-            is Number -> value.toDouble()
+            is Number -> value.toDouble() // Aceita Long, Int, Float, Double
             is String -> value.replace(",", ".").toDoubleOrNull() ?: 0.0
             else -> 0.0
         }
     }
 
-    // Converte qualquer coisa para Int
     private fun parseInt(value: Any?): Int {
+        if (value == null) return 0
         return when (value) {
             is Number -> value.toInt()
             is String -> value.trim().toIntOrNull() ?: 0

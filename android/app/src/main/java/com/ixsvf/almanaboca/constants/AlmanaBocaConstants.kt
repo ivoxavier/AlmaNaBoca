@@ -15,6 +15,10 @@ object AlmanaBocaConstants {
             //const val CONSULTATION = "consultations"
             //const val SHOP = "shop"
         }
+    }
 
+    object ADMINS {
+        const val MARTA = "martamartins340@gmail.com"
+        const val IVO = "ivofernandes12@gmail.com"
     }
 }

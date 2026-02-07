@@ -1,6 +1,9 @@
 package com.ixsvf.almanaboca.screens.menusubscreens
 
+import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -20,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -28,7 +32,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.ixsvf.almanaboca.R
+import com.ixsvf.almanaboca.constants.AlmanaBocaConstants
 import com.ixsvf.almanaboca.screens.components.AlmanaBocaLogo
 import com.ixsvf.almanaboca.screens.components.MartaBanner
 import com.ixsvf.almanaboca.screens.components.PaddingBox
@@ -36,6 +42,7 @@ import com.ixsvf.almanaboca.screens.components.SummaryTopPageText
 import com.ixsvf.almanaboca.services.model.HomeItem
 import com.ixsvf.almanaboca.ui.theme.states.HomeUiState
 import com.ixsvf.almanaboca.viewmodel.HomeViewModel
+import com.ixsvf.almanaboca.viewmodel.SessionViewModel
 
 // --- Cores ---
 private val CardWhite = Color.White
@@ -46,13 +53,21 @@ private val PromoYellowText = Color(0xFFB7791F)
 private val SpotifyGreen = Color(0xFF1DB954)
 private val AccentPurple = Color(0xFF7C4DFF)
 
+// --- CONFIGURAÇÃO DE ADMINS ---
+private val ADMIN_EMAILS = listOf(AlmanaBocaConstants.ADMINS.MARTA, AlmanaBocaConstants.ADMINS.IVO)
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = viewModel()
+    viewModel: HomeViewModel = viewModel(),
+    sessionViewModel: SessionViewModel = viewModel(), // Injeção do SessionViewModel
+    navController: NavController // Necessário para navegar
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val currentUser by sessionViewModel.currentUser.collectAsState() // Quem está logado?
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
 
     Column(modifier = modifier.fillMaxSize()) {
         when (val state = uiState) {
@@ -71,7 +86,28 @@ fun HomeScreen(
             }
             is HomeUiState.Success -> {
                 Column(modifier = Modifier.verticalScroll(scrollState)) {
-                    AlmanaBocaLogo()
+
+                    // --- LOGÓTIPO COM GATILHO SECRETO (LONG PRESS) ---
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .combinedClickable(
+                                onClick = { }, // Clique normal não faz nada
+                                onLongClick = {
+                                    val email = currentUser?.email ?: ""
+
+                                    if (ADMIN_EMAILS.contains(email)) {
+                                        Toast.makeText(context, "Bem-vinda Admin!", Toast.LENGTH_SHORT).show()
+                                        navController.navigate("admin_bookings")
+                                    } else {
+                                        // Opcional: Feedback para utilizadores normais (ou deixar vazio para ser secreto)
+                                        // Toast.makeText(context, "Acesso restrito", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            )
+                    ) {
+                        AlmanaBocaLogo()
+                    }
 
                     // --- SEPARAÇÃO DOS DADOS ---
                     val coachingItems = state.courses.filter { it.coachProgram.isNotEmpty() }
@@ -110,7 +146,7 @@ fun HomeScreen(
 
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        // --- RODAPÉ (Sobre Mim) ---
+                        // --- RODAPÉ (Sobre Mim - Lado a Lado) ---
                         PaddingBox { SummaryTopPageText(stringResource(R.string.lbl_about_me)) }
 
                         PaddingBox {
@@ -119,8 +155,12 @@ fun HomeScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.Start
                             ) {
+                                // Foto
                                 MartaBanner(size = 110.dp)
+
                                 Spacer(modifier = Modifier.width(16.dp))
+
+                                // Texto
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
                                         text = "Olá, eu sou a Marta!",
@@ -141,8 +181,7 @@ fun HomeScreen(
                             }
                         }
 
-                        // --- Redes Sociais (Agora sem Card) ---
-                        // Remover PaddingBox se quiser menos espaço, ou manter para consistência
+                        // --- Redes Sociais (Apenas Ícones) ---
                         PaddingBox {
                             SocialMediaIconsRow(
                                 "https://instagram.com/almanaboca",
@@ -233,7 +272,6 @@ fun DetailRowSmall(icon: ImageVector, text: String) {
     }
 }
 
-// MUDANÇA AQUI: Removido o Card, agora é apenas uma Row
 @Composable
 fun SocialMediaIconsRow(
     instagramUrl: String,
@@ -245,8 +283,8 @@ fun SocialMediaIconsRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp), // Padding vertical para afastar um pouco
-        horizontalArrangement = Arrangement.SpaceEvenly, // Ícones espaçados igualmente
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
         SocialIconItem(R.drawable.ic_instagram, "Instagram", { uriHandler.openUri(instagramUrl) }, Color(0xFFE1306C))
@@ -266,7 +304,7 @@ fun SocialIconItem(
         Icon(
             painter = painterResource(id = iconRes),
             contentDescription = contentDescription,
-            modifier = Modifier.size(32.dp), // Ícone um pouco maior já que não tem card
+            modifier = Modifier.size(32.dp),
             tint = tint
         )
     }

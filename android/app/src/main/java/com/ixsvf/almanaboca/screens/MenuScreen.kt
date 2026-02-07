@@ -87,7 +87,10 @@ fun MenuNavHost(
         composable(route = BottomBarScreen.Home.route) {
             // 2. Do NOT pass 'modifier' here. The NavHost already handled the padding.
             // Just let HomeScreen fill the available space inside the NavHost.
-            HomeScreen(modifier = Modifier.fillMaxSize())
+            HomeScreen(
+                modifier = Modifier.fillMaxSize(),
+                navController = navController
+            )
         }
 
         composable(route = BottomBarScreen.Booking.route) {
@@ -95,5 +98,6 @@ fun MenuNavHost(
             // Just let HomeScreen fill the available space inside the NavHost.
             BookingScreen(modifier = Modifier.fillMaxSize())
         }
+
     }
 }
