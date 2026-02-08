@@ -1,8 +1,10 @@
 package com.ixsvf.almanaboca.viewmodel
 
 import android.app.Application
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.ixsvf.almanaboca.R
 import com.ixsvf.almanaboca.constants.AlmanaBocaConstants
 import com.ixsvf.almanaboca.screens.menusubscreens.BookingItemUI
 import com.ixsvf.almanaboca.screens.menusubscreens.BookingStatus
@@ -89,10 +91,10 @@ class BookingViewModel(application: Application) : AndroidViewModel(application)
             _isLoading.value = true
             val success = repository.updateBookingStatus(bookingId, "confirmed")
             if (success) {
-                _bookingResult.value = "Reserva Aprovada!"
+                _bookingResult.value = getApplication<Application>().getString(R.string.lbl_booking_made)
                 refreshData() // Recarrega a lista
             } else {
-                _bookingResult.value = "Erro ao aprovar."
+                _bookingResult.value = getApplication<Application>().getString(R.string.lbl_booking_error_on_approval)
             }
             _isLoading.value = false
         }
@@ -103,10 +105,10 @@ class BookingViewModel(application: Application) : AndroidViewModel(application)
             _isLoading.value = true
             val success = repository.deleteBooking(bookingId)
             if (success) {
-                _bookingResult.value = "Reserva Eliminada."
+                _bookingResult.value = getApplication<Application>().getString(R.string.lbl_booking_deleted)
                 refreshData()
             } else {
-                _bookingResult.value = "Erro ao eliminar."
+                _bookingResult.value = getApplication<Application>().getString(R.string.lbl_booking_deleted_error)
             }
             _isLoading.value = false
         }
@@ -149,10 +151,10 @@ class BookingViewModel(application: Application) : AndroidViewModel(application)
             )
 
             if (repository.createBooking(newBooking)) {
-                _bookingResult.value = "Pedido enviado! Aguarda confirmação."
+                _bookingResult.value = getApplication<Application>().getString(R.string.lbl_booking_request_made)
                 refreshData()
             } else {
-                _bookingResult.value = "Erro: Horário ocupado."
+                _bookingResult.value = getApplication<Application>().getString(R.string.lbl_booking_hour_error)
             }
             _isLoading.value = false
         }

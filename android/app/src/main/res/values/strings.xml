@@ -22,5 +22,11 @@
     <string name="lbl_find_me">Find Me</string>
     <string name="lbl_about_me">About Me</string>
     <string name="lbl_error_triggered">An error occurred</string>
+    <string name="lbl_booking_made">Booking Approved!</string>
+    <string name="lbl_booking_deleted">Booking Deleted!</string>
+    <string name="lbl_booking_deleted_error">Error on delete!</string>
+    <string name="lbl_booking_request_made">Booking request sent. Await Confirmation.</string>
+    <string name="lbl_booking_hour_error">Error: Hour already Occupied!</string>
+    <string name="lbl_booking_error_on_approval">Error: Approval not made!</string>
 
 </resources>

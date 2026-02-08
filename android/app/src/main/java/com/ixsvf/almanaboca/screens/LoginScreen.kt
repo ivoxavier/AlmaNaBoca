@@ -54,7 +54,7 @@ fun LoginScreen(
     // 1. REDUÇÃO DO TEMPO DE ESPERA
     // De 3000ms (3s) para 1500ms (1.5s) -> O utilizador chega ao login mais rápido
     LaunchedEffect(Unit) {
-        delay(1500)
+        delay(1400)
         isSplashFinished = true
     }
 
