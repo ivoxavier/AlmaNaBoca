@@ -1,5 +1,7 @@
 package com.ixsvf.almanaboca.screens.menusubscreens
 
+import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -11,7 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.Headphones
@@ -43,6 +45,12 @@ import com.ixsvf.almanaboca.services.model.HomeItem
 import com.ixsvf.almanaboca.ui.theme.states.HomeUiState
 import com.ixsvf.almanaboca.viewmodel.HomeViewModel
 import com.ixsvf.almanaboca.viewmodel.SessionViewModel
+import java.net.URLEncoder
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 // --- Cores ---
 private val CardWhite = Color.White
@@ -51,21 +59,28 @@ private val TextDark = Color(0xFF1F2937)
 private val PromoYellowBg = Color(0xFFFFF9C4)
 private val PromoYellowText = Color(0xFFB7791F)
 private val SpotifyGreen = Color(0xFF1DB954)
+private val WhatsAppGreen = Color(0xFF25D366) // Cor do WhatsApp
 private val AccentPurple = Color(0xFF7C4DFF)
 
 // --- CONFIGURAÇÃO DE ADMINS ---
 private val ADMIN_EMAILS = listOf(AlmanaBocaConstants.ADMINS.MARTA, AlmanaBocaConstants.ADMINS.IVO)
+// --- NÚMERO DO WHATSAPP DE DESTINO ---
+private const val TARGET_WHATSAPP_NUMBER = AlmanaBocaConstants.ADMINS.MARTA_NUMBER
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(),
-    sessionViewModel: SessionViewModel = viewModel(), // Injeção do SessionViewModel
-    navController: NavController // Necessário para navegar
+    sessionViewModel: SessionViewModel = viewModel(),
+    navController: NavController
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val currentUser by sessionViewModel.currentUser.collectAsState() // Quem está logado?
+    val currentUser by sessionViewModel.currentUser.collectAsState()
+
+    // Obter o nome do utilizador para usar na mensagem do WhatsApp
+    val userName = currentUser?.displayName ?: "Alguém"
+
     val scrollState = rememberScrollState()
     val context = LocalContext.current
 
@@ -87,29 +102,25 @@ fun HomeScreen(
             is HomeUiState.Success -> {
                 Column(modifier = Modifier.verticalScroll(scrollState)) {
 
-                    // --- LOGÓTIPO COM GATILHO SECRETO (LONG PRESS) ---
+                    // --- LOGÓTIPO COM GATILHO SECRETO ---
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .combinedClickable(
-                                onClick = { }, // Clique normal não faz nada
+                                onClick = { },
                                 onLongClick = {
                                     val email = currentUser?.email ?: ""
-
                                     if (ADMIN_EMAILS.contains(email)) {
                                         Toast.makeText(context, "Bem-vinda Admin!", Toast.LENGTH_SHORT).show()
                                         navController.navigate("admin_bookings")
-                                    } else {
-                                        // Opcional: Feedback para utilizadores normais (ou deixar vazio para ser secreto)
-                                        // Toast.makeText(context, "Acesso restrito", Toast.LENGTH_SHORT).show()
                                     }
                                 }
                             )
                     ) {
-                        AlmanaBocaLogo()
+                        //AlmanaBocaLogo()
                     }
 
-                    // --- SEPARAÇÃO DOS DADOS ---
+                    // --- CONTEÚDO ---
                     val coachingItems = state.courses.filter { it.coachProgram.isNotEmpty() }
                     val meditationItem = state.courses.find { it.meditationCirclesType.isNotEmpty() }
 
@@ -117,9 +128,8 @@ fun HomeScreen(
                         modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        // --- CAROUSEL DE CURSOS ---
+                        // Cursos
                         PaddingBox { SummaryTopPageText(stringResource(R.string.lbl_coach_programs_available)) }
-
                         if (coachingItems.isNotEmpty()) {
                             LazyRow(
                                 contentPadding = PaddingValues(horizontal = 16.dp),
@@ -128,17 +138,15 @@ fun HomeScreen(
                                 items(coachingItems) { item -> ProgramCarouselCard(item) }
                             }
                         } else {
-                            PaddingBox {
-                                Text(stringResource(R.string.lbl_coach_programs_not_available), color = TextGray)
-                            }
+                            PaddingBox { Text(stringResource(R.string.lbl_coach_programs_not_available), color = TextGray) }
                         }
 
-                        // --- CARTÃO DE MEDITAÇÃO ---
+                        // Meditação
                         PaddingBox { SummaryTopPageText(stringResource(R.string.lbl_meditations_circles)) }
-
                         PaddingBox {
                             if (meditationItem != null) {
-                                MeditationCircleCard(item = meditationItem)
+                                // PASSAMOS O NOME DO UTILIZADOR PARA O CARD
+                                MeditationCircleCard(item = meditationItem, userName = userName)
                             } else {
                                 Text(stringResource(R.string.lbl_meditations_next_meditations), color = TextGray)
                             }
@@ -146,42 +154,25 @@ fun HomeScreen(
 
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        // --- RODAPÉ (Sobre Mim - Lado a Lado) ---
+                        // Sobre Mim
                         PaddingBox { SummaryTopPageText(stringResource(R.string.lbl_about_me)) }
-
                         PaddingBox {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.Start
                             ) {
-                                // Foto
                                 MartaBanner(size = 110.dp)
-
                                 Spacer(modifier = Modifier.width(16.dp))
-
-                                // Texto
                                 Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = "Olá, eu sou a Marta!",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = TextDark
-                                    )
+                                    Text("Olá, eu sou a Marta!", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = TextDark)
                                     Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        text = "A minha missão é ajudar-te a encontrar a tua voz e o teu equilíbrio...",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = TextGray,
-                                        lineHeight = 18.sp,
-                                        maxLines = 5,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
+                                    Text("A minha missão é ajudar-te a encontrar a tua voz e o teu equilíbrio...", style = MaterialTheme.typography.bodySmall, color = TextGray, lineHeight = 18.sp, maxLines = 5, overflow = TextOverflow.Ellipsis)
                                 }
                             }
                         }
 
-                        // --- Redes Sociais (Apenas Ícones) ---
+                        // Redes Sociais
                         PaddingBox {
                             SocialMediaIconsRow(
                                 "https://instagram.com/almanaboca",
@@ -236,7 +227,46 @@ fun ProgramCarouselCard(item: HomeItem) {
 }
 
 @Composable
-fun MeditationCircleCard(item: HomeItem) {
+fun MeditationCircleCard(item: HomeItem, userName: String) {
+    val context = LocalContext.current
+
+    // --- LÓGICA DE DATA E HORA ---
+    // Pair<String, Boolean> -> O primeiro é o texto a mostrar, o segundo é se está aberto
+    val sessionInfo = remember(item.meditationCirclesNextSession) {
+        try {
+            if (item.meditationCirclesNextSession.isEmpty()) return@remember Pair("Data a definir", false)
+
+            // 1. Parse da data
+            val formatter = DateTimeFormatter.ofPattern("[dd.MM.yyyy][dd/MM/yyyy]")
+            val sessionDate = LocalDate.parse(item.meditationCirclesNextSession.trim(), formatter)
+
+            val today = LocalDate.now()
+            val currentDateTime = LocalDateTime.now()
+
+            // Prazo: Dia da sessão às 11:30
+            val deadlineDateTime = sessionDate.atTime(11, 30)
+
+            // 2. Determinar o texto a mostrar
+            // Se a data da sessão for ANTERIOR a hoje (ontem ou antes), mostramos "Data a definir"
+            val displayText = if (sessionDate.isBefore(today)) {
+                "Data a definir"
+            } else {
+                "Próxima: ${item.meditationCirclesNextSession}"
+            }
+
+            // 3. Determinar se o botão está ativo
+            // O botão só está ativo se a hora atual for ANTERIOR ao prazo
+            val isOpen = currentDateTime.isBefore(deadlineDateTime)
+
+            Pair(displayText, isOpen)
+        } catch (e: Exception) {
+            Pair("Data a definir", false)
+        }
+    }
+
+    val dateLabel = sessionInfo.first
+    val isRegistrationOpen = sessionInfo.second
+
     Card(
         colors = CardDefaults.cardColors(containerColor = CardWhite),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -251,13 +281,47 @@ fun MeditationCircleCard(item: HomeItem) {
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
             Spacer(modifier = Modifier.height(12.dp))
 
-            DetailRowSmall(Icons.Outlined.CalendarMonth, if (item.meditationCirclesNextSession.isNotEmpty()) "Próxima: ${item.meditationCirclesNextSession}" else "Data a anunciar")
+            // AQUI USAMOS O TEXTO CALCULADO
+            DetailRowSmall(Icons.Outlined.CalendarMonth, dateLabel)
+
             Spacer(modifier = Modifier.height(8.dp))
             DetailRowSmall(Icons.Outlined.LocationOn, item.meditationCirclesLocation.ifEmpty { stringResource(R.string.lbl_meditations_type) })
 
             if (item.meditationCirclesPrice > 0.0) {
                 Spacer(modifier = Modifier.height(8.dp))
                 DetailRowSmall(Icons.Outlined.LocalOffer, "${item.meditationCirclesPrice} €")
+            }
+
+            // --- BOTÃO DE INSCRIÇÃO ---
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    try {
+                        val message = "Nome: $userName, conta comigo."
+                        val encodedMessage = URLEncoder.encode(message, "UTF-8")
+                        val url = "https://wa.me/$TARGET_WHATSAPP_NUMBER?text=$encodedMessage"
+                        val intent = Intent(Intent.ACTION_VIEW)
+                        intent.data = Uri.parse(url)
+                        context.startActivity(intent)
+                    } catch (e: Exception) {
+                        Toast.makeText(context, "Erro ao abrir WhatsApp", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                enabled = isRegistrationOpen,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isRegistrationOpen) WhatsAppGreen else Color.LightGray
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Icon(Icons.Default.Send, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = if (isRegistrationOpen) "INSCREVER AGORA" else "INSCRIÇÕES FECHADAS",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
             }
         }
     }
@@ -279,11 +343,8 @@ fun SocialMediaIconsRow(
     youtubeUrl: String
 ) {
     val uriHandler = LocalUriHandler.current
-
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -294,19 +355,9 @@ fun SocialMediaIconsRow(
 }
 
 @Composable
-fun SocialIconItem(
-    iconRes: Int,
-    contentDescription: String,
-    onClick: () -> Unit,
-    tint: Color
-) {
+fun SocialIconItem(iconRes: Int, contentDescription: String, onClick: () -> Unit, tint: Color) {
     IconButton(onClick = onClick, modifier = Modifier.size(48.dp)) {
-        Icon(
-            painter = painterResource(id = iconRes),
-            contentDescription = contentDescription,
-            modifier = Modifier.size(32.dp),
-            tint = tint
-        )
+        Icon(painter = painterResource(id = iconRes), contentDescription = contentDescription, modifier = Modifier.size(32.dp), tint = tint)
     }
 }
 

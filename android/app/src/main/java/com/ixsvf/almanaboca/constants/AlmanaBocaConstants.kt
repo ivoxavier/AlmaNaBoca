@@ -19,6 +19,9 @@ object AlmanaBocaConstants {
 
     object ADMINS {
         const val MARTA = "martamartins340@gmail.com"
+
+        const val MARTA_NUMBER = "351915382220"
+
         const val IVO = "ivofernandes12@gmail.com"
     }
 }

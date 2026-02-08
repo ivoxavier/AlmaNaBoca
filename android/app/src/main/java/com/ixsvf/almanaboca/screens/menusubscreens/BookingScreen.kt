@@ -83,6 +83,15 @@ fun BookingScreen(
     LaunchedEffect(bookingResult) {
         bookingResult?.let { message ->
             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+
+            if (message.contains("enviado", ignoreCase = true) ||
+                message.contains("sucesso", ignoreCase = true) ||
+                message.contains("Booking request sent. Await Confirmation.") ||
+                message.contains("Aprovada", ignoreCase = true)) {
+
+                showBookingForm = false // Fecha o formulário
+            }
+
             viewModel.clearResult()
             if (message.contains("enviado")) showBookingForm = false
         }

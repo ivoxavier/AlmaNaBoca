@@ -1,103 +1,83 @@
 package com.ixsvf.almanaboca.screens
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BookOnline
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.SelfImprovement
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.ixsvf.almanaboca.R
-import com.ixsvf.almanaboca.constants.AlmanaBocaConstants
 import com.ixsvf.almanaboca.screens.components.BottomNavigationBar
 import com.ixsvf.almanaboca.screens.menusubscreens.BookingScreen
 import com.ixsvf.almanaboca.screens.menusubscreens.HomeScreen
 import com.ixsvf.almanaboca.screens.menusubscreens.MeditationsScreen
-import com.ixsvf.almanaboca.viewmodel.SessionViewModel
 
-
+// Definição dos itens da Barra
 sealed class BottomBarScreen(
     val route: String,
-    @StringRes val title: Int,
-    @DrawableRes val icon: Int
+    val title: Int,
+    val icon: ImageVector
 ) {
-    object Meditations : BottomBarScreen(
-        AlmanaBocaConstants.NAVIGATION_ROUTES.MENU_SCREEN.MEDITATION,
-        R.string.lbl_btbar_meditation,
-        R.drawable.ic_meditation
-    )
-
-    object Home: BottomBarScreen(
-        AlmanaBocaConstants.NAVIGATION_ROUTES.MENU_SCREEN.HOME,
-        R.string.lbl_btbar_home,
-        R.drawable.ic_home
-    )
-
-    object Booking : BottomBarScreen(
-        AlmanaBocaConstants.NAVIGATION_ROUTES.MENU_SCREEN.BOOKING,
-        title = R.string.lbl_btbar_booking,
-        icon = R.drawable.ic_consultation
-    )
-    // object Meditations : BottomBarScreen(...)
-    // object Consultations : BottomBarScreen(...)
-    // object Shop : BottomBarScreen(...)
+    object Meditations : BottomBarScreen("meditations", R.string.lbl_btbar_meditation, Icons.Default.SelfImprovement)
+    object Home : BottomBarScreen("home", R.string.lbl_btbar_home, Icons.Default.Home)
+    object Booking : BottomBarScreen("booking", R.string.lbl_btbar_booking, Icons.Default.BookOnline)
 }
 
 @Composable
 fun MenuScreen(
-    navController: NavController,
-    sessionViewModel: SessionViewModel = viewModel()
+    rootNavController: NavHostController // Este serve para ir para o Login ou Admin
 ) {
-    // This controller manages ONLY the bottom bar tabs (Home, Shop, etc.)
-    val bottomBarNavController = rememberNavController()
+    // 1. CRIAR UM NOVO CONTROLADOR APENAS PARA AS ABAS (Resolve o Crash)
+    val bottomNavController = rememberNavController()
 
     Scaffold(
-        bottomBar = { BottomNavigationBar(navController = bottomBarNavController) }
-    ) { paddingValues ->
-        // We pass the paddingValues to the Host via modifier
+        bottomBar = {
+            BottomNavigationBar(navController = bottomNavController)
+        }
+    ) { innerPadding ->
+        // Passamos os dois controladores
         MenuNavHost(
-            navController = bottomBarNavController,
-            modifier = Modifier.padding(paddingValues)
+            bottomNavController = bottomNavController,
+            rootNavController = rootNavController,
+            modifier = Modifier.padding(innerPadding)
         )
     }
 }
 
 @Composable
 fun MenuNavHost(
-    navController: NavHostController,
+    bottomNavController: NavHostController,
+    rootNavController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     NavHost(
-        navController = navController,
+        navController = bottomNavController,
         startDestination = BottomBarScreen.Home.route,
-        modifier = modifier // 1. The NavHost applies the Scaffold padding here
+        modifier = modifier
     ) {
         composable(route = BottomBarScreen.Meditations.route) {
-            // 2. Do NOT pass 'modifier' here. The NavHost already handled the padding.
-            // Just let HomeScreen fill the available space inside the NavHost.
             MeditationsScreen(modifier = Modifier.fillMaxSize())
         }
 
         composable(route = BottomBarScreen.Home.route) {
-            // 2. Do NOT pass 'modifier' here. The NavHost already handled the padding.
-            // Just let HomeScreen fill the available space inside the NavHost.
             HomeScreen(
                 modifier = Modifier.fillMaxSize(),
-                navController = navController
+                // IMPORTANTE: Passamos o 'rootNavController' para o HomeScreen
+                // porque é ele que sabe ir para o ecrã de "admin_bookings"
+                navController = rootNavController
             )
         }
 
         composable(route = BottomBarScreen.Booking.route) {
-            // 2. Do NOT pass 'modifier' here. The NavHost already handled the padding.
-            // Just let HomeScreen fill the available space inside the NavHost.
             BookingScreen(modifier = Modifier.fillMaxSize())
         }
-
     }
 }
