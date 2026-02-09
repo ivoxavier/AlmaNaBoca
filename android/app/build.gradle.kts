@@ -92,4 +92,5 @@ dependencies {
     implementation(libs.work.runtime.ktx)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.firebase.messaging)
 }

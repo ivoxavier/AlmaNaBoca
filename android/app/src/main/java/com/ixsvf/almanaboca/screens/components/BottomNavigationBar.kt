@@ -1,19 +1,23 @@
 package com.ixsvf.almanaboca.screens.components
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -26,9 +30,8 @@ import com.ixsvf.almanaboca.screens.BottomBarScreen
 
 // Cores da Marca
 private val BrandRed = Color(0xFF9E1919)
+private val BrandRedLight = Color(0xFFFFE5E5)
 private val IconGray = Color(0xFF9CA3AF)
-
-private val BottomBarBackground = Color(0xFFF5F5F5)
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
@@ -45,13 +48,15 @@ fun BottomNavigationBar(navController: NavController) {
     Box(
         modifier = Modifier.fillMaxWidth()
     ) {
-        // 1. BARRA DE FUNDO (Mantém-se igual)
+        // 1. BARRA DE FUNDO
         NavigationBar(
             modifier = Modifier
                 .height(80.dp)
-                .align(Alignment.BottomCenter),
-            containerColor = BottomBarBackground,
-            tonalElevation = 10.dp
+                .align(Alignment.BottomCenter) // Alinhada ao fundo
+                .shadow(elevation = 16.dp, shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)),
+            containerColor = Color.White,
+            tonalElevation = 0.dp
         ) {
             screens.forEach { screen ->
                 if (screen == null) {
@@ -70,13 +75,14 @@ fun BottomNavigationBar(navController: NavController) {
                             Icon(
                                 imageVector = screen.icon,
                                 contentDescription = stringResource(id = screen.title),
-                                modifier = Modifier.size(26.dp)
+                                modifier = Modifier.size(28.dp)
                             )
                         },
                         label = {
                             Text(
                                 text = stringResource(id = screen.title),
-                                style = MaterialTheme.typography.labelSmall
+                                style = MaterialTheme.typography.labelMedium,
+                                modifier = Modifier.padding(top = 4.dp)
                             )
                         },
                         selected = isSelected,
@@ -90,7 +96,7 @@ fun BottomNavigationBar(navController: NavController) {
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = BrandRed,
                             selectedTextColor = BrandRed,
-                            indicatorColor = Color.Transparent,
+                            indicatorColor = BrandRedLight,
                             unselectedIconColor = IconGray,
                             unselectedTextColor = IconGray
                         )
@@ -99,7 +105,7 @@ fun BottomNavigationBar(navController: NavController) {
             }
         }
 
-        // 2. BOTÃO FLUTUANTE (HOME) COM O LOGO
+        // 2. BOTÃO FLUTUANTE (Posicionado "Mais Dentro")
         FloatingActionButton(
             onClick = {
                 navController.navigate(BottomBarScreen.Home.route) {
@@ -109,22 +115,21 @@ fun BottomNavigationBar(navController: NavController) {
                 }
             },
             shape = CircleShape,
-            containerColor = BrandRed, // Fundo vermelho
+            containerColor = BrandRed,
             contentColor = Color.White,
             elevation = FloatingActionButtonDefaults.elevation(8.dp),
             modifier = Modifier
-                .align(Alignment.TopCenter)
-                .offset(y = (-20).dp)
-                .size(65.dp)
+                .align(Alignment.BottomCenter) // IMPORTANTE: Alinha pelo fundo também
+                .offset(y = (-18).dp) // "Empurra" para cima apenas 25dp (menos que antes)
+                .size(72.dp)
+                // A borda branca cria o efeito de recorte na barra
+                .border(BorderStroke(5.dp, Color.White), CircleShape)
         ) {
-            // --- AQUI ESTÁ A MUDANÇA ---
-            // Usamos 'Icon' com painterResource e tint Unspecified para manter as cores do JPG
             Icon(
-                // SUBSTITUA 'R.drawable.almanaboca_logo' PELO NOME DO SEU FICHEIRO
                 painter = painterResource(id = R.drawable.almanaboca),
                 contentDescription = "Home",
-                modifier = Modifier.size(70.dp), // Ajuste o tamanho do logo aqui
-                tint = Color.Unspecified // IMPORTANTE: Isto faz com que o logo não fique branco!
+                modifier = Modifier.size(76.dp),
+                tint = Color.Unspecified
             )
         }
     }

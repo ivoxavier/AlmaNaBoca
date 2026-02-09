@@ -54,6 +54,8 @@ fun AlmanaBocaNavigation(
 
             LaunchedEffect(uiState) {
                 if (uiState is LoginUiState.Success) {
+                    sessionViewModel.updateFcmToken(sessionViewModel.currentUser.value?.email ?: "")
+
                     navController.navigate(Screen.Menu.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
