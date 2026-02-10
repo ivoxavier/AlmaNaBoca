@@ -21,6 +21,16 @@ struct LoginScreen: View {
     @State private var isSplashFinished = false
     @State private var showFormAnimation = false
     
+    // VARIÁVEIS PARA O ALERTA DE ERRO
+    @State private var showErrorAlert = false
+    @State private var errorMessage = ""
+    
+    // Foco dos campos
+    @FocusState private var focusedField: Field?
+    enum Field {
+        case email, password
+    }
+    
     // Helper para verificar loading
     var isLoading: Bool {
         if case .loading = uiState { return true }
@@ -29,7 +39,7 @@ struct LoginScreen: View {
 
     var body: some View {
         ZStack {
-            // Fundo Vermelho
+            // 1. FUNDO SÓLIDO
             Color.brandRed
                 .ignoresSafeArea()
             
@@ -39,69 +49,64 @@ struct LoginScreen: View {
             if !isSplashFinished {
                 // --- FASE 1: SPLASH ---
                 VStack {
-                    // MUDANÇA 1: Usar a tua imagem "AppLogo"
-                    // Se o teu logo for branco transparente, usa assim:
-                    /*Image("AppIcon")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 150, height: 150)
-                        .padding(32)
-                    */
-                    // DICA: Se o teu logo for preto ou colorido e quiseres forçar a ficar BRANCO
-                    //   para combinar com o fundo vermelho, usa este código em vez do de cima:
-                     
                     Image("AppLogo")
-                        .renderingMode(.template) // Permite mudar a cor
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(width: 280, height: 280)
-                        //.foregroundColor(.white) // Pinta de branco
+                        .frame(width: 300, height: 300)
                         .padding(32)
-                
                 }
                 .transition(.opacity)
-            }
-            else {
+            } else {
                 // --- FASE 2: LOGIN ---
                 VStack(spacing: 0) {
                     
-                    Text("Bem-vindo")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
+                    Spacer()
                     
-                    Spacer().frame(height: 16)
-                    
-                    // MUDANÇA 2: O Logo mais pequeno no topo do formulário
+                    // Logo
                     Image("AppLogo")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(height: 200)
-                        // .foregroundColor(.white) // Descomenta se precisares de forçar a cor branca
+                        .frame(height: 180)
+                        .padding(.bottom, 10)
                     
-                    // --- ÁREA ANIMADA ---
+                  
+                    
+                    // --- ÁREA DO FORMULÁRIO ---
                     if showFormAnimation {
-                        VStack(spacing: 0) {
+                        VStack(spacing: 20) {
                             
-                            Spacer().frame(height: 30)
+                            Spacer().frame(height: 20)
                             
-                            CustomTextField(
+                            // Campo Email
+                            ModernTextField(
                                 text: $email,
-                                label: "Conta",
+                                placeholder: "Email",
+                                iconName: "envelope.fill",
                                 isSecure: false
                             )
+                            .focused($focusedField, equals: .email)
+                            .submitLabel(.next)
+                            .onSubmit { focusedField = .password }
                             
-                            Spacer().frame(height: 16)
-                            
-                            CustomTextField(
+                            // Campo Password
+                            ModernTextField(
                                 text: $password,
-                                label: "Password",
+                                placeholder: "Password",
+                                iconName: "lock.fill",
                                 isSecure: true
                             )
+                            .focused($focusedField, equals: .password)
+                            .submitLabel(.go)
+                            .onSubmit {
+                                if !isLoading { onLoginClick(email, password) }
+                            }
                             
-                            Spacer().frame(height: 24)
+                            Spacer().frame(height: 10)
                             
+                            // Botão Entrar
                             Button(action: {
                                 if !isLoading {
+                                    focusedField = nil
                                     onLoginClick(email, password)
                                 }
                             }) {
@@ -110,88 +115,116 @@ struct LoginScreen: View {
                                         ProgressView()
                                             .tint(.brandRed)
                                     } else {
-                                        Text("Entrar")
-                                            .fontWeight(.bold)
+                                        Text("Login")
+                                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                                            .tracking(1)
                                     }
                                 }
                                 .frame(maxWidth: .infinity)
-                                .frame(height: 50)
+                                .frame(height: 56)
                                 .background(Color.white)
                                 .foregroundColor(.brandRed)
-                                .cornerRadius(8)
+                                .clipShape(Capsule())
+                                .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 5)
                             }
                             .disabled(isLoading)
+                            .opacity(isLoading ? 0.8 : 1.0)
                             
-                            Spacer().frame(height: 32)
-                            
-                            Text("Esqueci-me da palavra-passe")
-                                .font(.caption)
-                                .underline()
+                            // Link Esqueci Password
+                            Button(action: {
+                                // Ação de recuperar password
+                            }) {
+                                Text("Esqueci-me da palavra-passe")
+                                    .font(.system(size: 14, weight: .medium, design: .rounded))
+                                    .underline()
+                                    .foregroundColor(.white.opacity(0.8))
+                            }
+                            .padding(.top, 10)
                         }
+                        .padding(.horizontal, 30)
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                     }
+                    
+                    Spacer()
                 }
-                .padding(.top, 60)
-                .padding(.horizontal, 24)
-                .frame(maxWidth: .infinity, alignment: .top)
+                .padding(.top, 20)
+                .ignoresSafeArea(.keyboard, edges: .bottom)
             }
         }
+        // --- ANIMAÇÕES DE ENTRADA ---
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                withAnimation(.easeInOut(duration: 0.5)) {
+                withAnimation(.easeInOut(duration: 0.6)) {
                     isSplashFinished = true
                 }
-                
-                withAnimation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.1)) {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.1)) {
                     showFormAnimation = true
                 }
             }
         }
+        // --- LÓGICA DO ALERTA DE ERRO ---
+        .onChange(of: uiState) { newState in
+            if case .error(let message) = newState {
+                self.errorMessage = message
+                self.showErrorAlert = true
+            }
+        }
+        .alert("Atenção", isPresented: $showErrorAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(errorMessage)
+        }
     }
 }
 
-// MARK: - Componentes Auxiliares
+// MARK: - Componentes Modernos
 
-struct CustomTextField: View {
-  @Binding var text: String
-  var label: String
-  var isSecure: Bool
-
+struct ModernTextField: View {
+    @Binding var text: String
+    var placeholder: String
+    var iconName: String
+    var isSecure: Bool
+    
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(label)
-                            .font(.caption)
-                            .fontWeight(
-                            .semibold)
-                                if isSecure {
-                                    SecureField("", text: $text)
-                                    .padding()
-                                    .background(Color.white.opacity(0.2))
-                                    .cornerRadius(8)
-                                    .overlay(
-                                    RoundedRectangle(cornerRadius: 8)
-                                            .stroke(Color.white, lineWidth: 1)
-                        )
-                            } else {
-                            TextField("", text: $text)
-                            .padding()
-                            .background(Color.white.opacity(0.2))
-                            .cornerRadius(8)
-                            .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.white, lineWidth: 1)
-                    )
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled(true)
+        HStack(spacing: 15) {
+            Image(systemName: iconName)
+                .foregroundColor(.white.opacity(0.8))
+                .frame(width: 20)
+            
+            ZStack(alignment: .leading) {
+                if text.isEmpty {
+                    Text(placeholder)
+                        .foregroundColor(.white.opacity(0.6))
+                        .font(.system(size: 16, design: .rounded))
                 }
+                
+                if isSecure {
+                    SecureField("", text: $text)
+                        .foregroundColor(.white)
+                        .accentColor(.white)
+                } else {
+                    TextField("", text: $text)
+                        .foregroundColor(.white)
+                        .accentColor(.white)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled(true)
+                        .keyboardType(placeholder == "Email" ? .emailAddress : .default)
+                }
+            }
         }
+        .padding()
+        .background(Color.white.opacity(0.2))
+        .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.white.opacity(0.3), lineWidth: 1)
+        )
     }
 }
 
 // MARK: - Previews
 struct LoginScreen_Previews: PreviewProvider {
     static var previews: some View {
-        // CORREÇÃO AQUI: Passar o Enum .idle em vez da String "Idle"
-    LoginScreen(uiState: .idle, onLoginClick: { _, _ in })
- }
+        LoginScreen(uiState: .idle, onLoginClick: { _, _ in })
+    }
 }

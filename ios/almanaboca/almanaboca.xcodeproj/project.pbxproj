@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		787BF4B02F3BECBB007F3DFB /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 787BF4AF2F3BECBB007F3DFB /* FirebaseCore */; };
+		787BF4B22F3BED6C007F3DFB /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 787BF4B12F3BED6C007F3DFB /* FirebaseAuth */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		78952BCB2F14145200BB8208 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +57,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				787BF4B02F3BECBB007F3DFB /* FirebaseCore in Frameworks */,
+				787BF4B22F3BED6C007F3DFB /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,12 +79,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		787BF4AE2F3BECBB007F3DFB /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		78952BB12F14144F00BB8208 = {
 			isa = PBXGroup;
 			children = (
 				78952BBC2F14144F00BB8208 /* almanaboca */,
 				78952BCD2F14145200BB8208 /* almanabocaTests */,
 				78952BD72F14145200BB8208 /* almanabocaUITests */,
+				787BF4AE2F3BECBB007F3DFB /* Frameworks */,
 				78952BBB2F14144F00BB8208 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -112,6 +127,8 @@
 			);
 			name = almanaboca;
 			packageProductDependencies = (
+				787BF4AF2F3BECBB007F3DFB /* FirebaseCore */,
+				787BF4B12F3BED6C007F3DFB /* FirebaseAuth */,
 			);
 			productName = almanaboca;
 			productReference = 78952BBA2F14144F00BB8208 /* almanaboca.app */;
@@ -195,6 +212,9 @@
 			);
 			mainGroup = 78952BB12F14144F00BB8208;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				787BF4AD2F3BEB1B007F3DFB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 78952BBB2F14144F00BB8208 /* Products */;
 			projectDirPath = "";
@@ -413,7 +433,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = org.ixsvf.almanaboca;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ixsvf.almanaboca;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -558,6 +578,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		787BF4AD2F3BEB1B007F3DFB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.9.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		787BF4AF2F3BECBB007F3DFB /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 787BF4AD2F3BEB1B007F3DFB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		787BF4B12F3BED6C007F3DFB /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 787BF4AD2F3BEB1B007F3DFB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 78952BB22F14144F00BB8208 /* Project object */;
 }

@@ -1,57 +1,64 @@
 import SwiftUI
-import Combine
+import FirebaseAuth
 
-// @MainActor garante que todas as atualizações de UI aconteçam na thread principal
 @MainActor
 class SessionViewModel: ObservableObject {
     
-    // Inicializa o repositório (Vê a secção 3 abaixo para o código disto)
-    private let usersRepository = UsersRepository()
-    
-    // Equivalente ao _uiState / uiState
     @Published var uiState: LoginUiState = .idle
-    
-    // Equivalente ao _currentUser / currentUser
     @Published var currentUser: UserProfile? = nil
     
-    // Não precisamos de 'Job' no Swift, usamos Tasks que são canceladas automaticamente
-    // se a View morrer, ou guardamos a referência se quisermos cancelar manualmente.
-    
     func login(email: String, pass: String) {
-        // 1. Atualizar UI para Loading
         self.uiState = .loading
         
-        // 2. Iniciar a tarefa assíncrona (substituto do viewModelScope.launch)
-        Task {
-            do {
-                let cleanEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
-                let cleanPassword = pass.trimmingCharacters(in: .whitespacesAndNewlines)
-                
-                // Chamada ao repositório (com await)
-                let firebaseUser = try await usersRepository.signIn(email: cleanEmail, password: cleanPassword)
-                
-                if let user = firebaseUser {
-                    // Mapeamento do utilizador (Adaptei para Swift)
-                    self.currentUser = user
-                    
-                    // Sucesso: Volta ao estado Idle ou Success
-                    self.uiState = .idle
-                    print("Login com sucesso: \(user.name)")
+        let cleanEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleanPass = pass.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        Auth.auth().signIn(withEmail: cleanEmail, password: cleanPass) { [weak self] result, error in
+            guard let self = self else { return }
+            
+            if let error = error as NSError? {
+                // TRADUÇÃO DOS ERROS DO FIREBASE
+                let errorMessage: String
+                if let errorCode = AuthErrorCode(rawValue: error.code) {
+                    switch errorCode {
+                    case .invalidEmail:
+                        errorMessage = "O formato do e-mail é inválido."
+                    case .wrongPassword:
+                        errorMessage = "A palavra-passe está incorreta."
+                    case .userNotFound:
+                        errorMessage = "Não existe conta com este e-mail."
+                    case .userDisabled:
+                        errorMessage = "Este utilizador foi desativado."
+                    case .networkError:
+                        errorMessage = "Erro de conexão. Verifique a internet."
+                    default:
+                        errorMessage = "Credenciais inválidas ou erro no sistema."
+                    }
                 } else {
-                    self.uiState = .error("Login falhou: Utilizador nulo.")
+                    errorMessage = error.localizedDescription
                 }
                 
-            } catch {
-                // Captura de erros
-                self.uiState = .error(error.localizedDescription)
+                print("Erro Login: \(errorMessage)")
+                self.uiState = .error(errorMessage)
+                
+            } else if let user = result?.user {
+                print("Login Sucesso: \(user.uid)")
+                
+                self.currentUser = UserProfile(
+                    id: user.uid,
+                    name: user.displayName ?? "Utilizador",
+                    email: user.email ?? "",
+                    isActive: true
+                )
+                
+                self.uiState = .idle
             }
         }
     }
     
-    func startSession(userId: String) {
-        Task {
-            // Lógica de sessão futura...
-            print("Sessão iniciada para \(userId)")
-        }
+    func logout() {
+        try? Auth.auth().signOut()
+        self.currentUser = nil
+        self.uiState = .idle
     }
 }

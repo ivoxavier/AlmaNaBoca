@@ -1,7 +1,7 @@
 import Foundation
 
 // Equivalente ao teu UserProfile data class
-struct UserProfile: Identifiable, Codable {
+struct UserProfile: Identifiable, Codable, Equatable {
     let id: String
     let name: String
     let email: String
