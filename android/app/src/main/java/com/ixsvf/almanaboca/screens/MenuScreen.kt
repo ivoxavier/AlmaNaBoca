@@ -53,7 +53,7 @@ fun MenuScreen(
 @Composable
 fun MenuNavHost(
     bottomNavController: NavHostController,
-    rootNavController: NavHostController,
+    rootNavController: NavHostController, // Usamos este para o player (para tapar a barra de baixo)
     modifier: Modifier = Modifier
 ) {
     NavHost(
@@ -61,21 +61,19 @@ fun MenuNavHost(
         startDestination = BottomBarScreen.Home.route,
         modifier = modifier
     ) {
-        // --- AQUI ESTAVA O ERRO ---
+        // 1. TELA DE MEDITAÇÕES
         composable(route = BottomBarScreen.Meditations.route) {
             MeditationsScreen(
                 modifier = Modifier.fillMaxSize(),
                 onVideoClick = { videoId ->
-                    // AQUI VOCÊ DEVE NAVEGAR PARA O PLAYER
-                    // Como o player deve abrir "por cima" de tudo, usamos o rootNavController
-                    // rootNavController.navigate("player/$videoId")
-
-                    // (Por enquanto deixamos vazio ou com um log, até criares a rota do player)
-                    android.util.Log.d("MenuScreen", "Abrir vídeo: $videoId")
+                    // --- AQUI ESTAVA A FALTAR A NAVEGAÇÃO ---
+                    // Navegamos usando o rootNavController para sair das abas e abrir o player
+                    rootNavController.navigate("player/$videoId")
                 }
             )
         }
 
+        // 2. TELA HOME
         composable(route = BottomBarScreen.Home.route) {
             HomeScreen(
                 modifier = Modifier.fillMaxSize(),
@@ -83,8 +81,14 @@ fun MenuNavHost(
             )
         }
 
+        // 3. TELA BOOKING
         composable(route = BottomBarScreen.Booking.route) {
             BookingScreen(modifier = Modifier.fillMaxSize())
         }
+
+        // 4. NOVA ROTA: PLAYER DE VÍDEO (Adicione isto se ainda não tiver no root graph,
+        // mas como estamos dentro do MenuNavHost que usa o bottomNavController,
+        // o ideal é definir esta rota no AlmanaBocaNavigation (MainActivity).
+        // Vê a explicação abaixo.
     }
 }

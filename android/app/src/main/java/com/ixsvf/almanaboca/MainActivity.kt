@@ -9,9 +9,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.ixsvf.almanaboca.screens.LoginScreen
 import com.ixsvf.almanaboca.screens.MenuScreen
 import com.ixsvf.almanaboca.ui.theme.AlmaNaBocaTheme
@@ -81,12 +83,13 @@ fun AlmanaBocaNavigation(
             MenuScreen(rootNavController = navController)
         }
 
-        // --- ROTA DE ADMIN ---
-        composable("admin_bookings") {
-            // Descomente quando tiver o ecrã importado
-            // com.ixsvf.almanaboca.screens.menusubscreens.AdminBookingScreen(
-            //     onBackClick = { navController.popBackStack() }
-            // )
+        composable(
+            route = "player/{videoId}",
+            arguments = listOf(navArgument("videoId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val videoId = backStackEntry.arguments?.getString("videoId") ?: ""
+            // Chama o ecrã que criámos no Passo 2
+            com.ixsvf.almanaboca.screens.menusubscreens.YouTubeScreen(videoId = videoId)
         }
     }
 }
