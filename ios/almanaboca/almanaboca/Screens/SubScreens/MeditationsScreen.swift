@@ -1,15 +1,7 @@
 import SwiftUI
 
 // --- Cores Específicas ---
-extension Color {
-    static let meditationPrimary = Color(red: 108/255, green: 99/255, blue: 255/255) // #6C63FF
-    static let textDark = Color(red: 31/255, green: 41/255, blue: 55/255) // #1F2937
-    static let textLight = Color(red: 156/255, green: 163/255, blue: 175/255) // #9CA3AF
-    
-    // Gradiente do Hero Card
-    static let heroPurple = Color(red: 142/255, green: 45/255, blue: 226/255) // #8E2DE2
-    static let heroBlue = Color(red: 74/255, green: 0/255, blue: 224/255)   // #4A00E0
-}
+
 
 struct MeditationsScreen: View {
     @StateObject private var viewModel = MeditationsViewModel()
@@ -191,12 +183,12 @@ struct MeditationListItem: View {
                     Text(meditation.dayTitle)
                         .font(.caption)
                         .fontWeight(.bold)
-                        .foregroundColor(meditation.isLocked ? .textLight : .meditationPrimary)
+                        .foregroundColor(meditation.isLocked ? .textDark : .meditationPrimary)
                     
                     Text(meditation.title)
                         .font(.body)
                         .fontWeight(.semibold)
-                        .foregroundColor(meditation.isLocked ? .textLight : .textDark)
+                        .foregroundColor(meditation.isLocked ? .textDark : .textDark)
                 }
                 
                 Spacer()
@@ -204,7 +196,7 @@ struct MeditationListItem: View {
                 // 3. Duração
                 Text(meditation.duration)
                     .font(.subheadline)
-                    .foregroundColor(.textLight)
+                    .foregroundColor(.textGray)
             }
             .padding(16)
             .background(isSelected ? Color.meditationPrimary.opacity(0.1) : Color.white)

@@ -1,298 +1,396 @@
 import SwiftUI
 
-// --- Cores (Mantidas do teu código) ---
-extension Color {
-    static let cardWhite = Color.white
-    static let textGray = Color(red: 107/255, green: 114/255, blue: 128/255) // #6B7280
-    static let promoYellowBg = Color(red: 255/255, green: 249/255, blue: 196/255) // #FFF9C4
-    static let promoYellowText = Color(red: 183/255, green: 121/255, blue: 31/255) // #B7791F
-    static let spotifyGreen = Color(red: 29/255, green: 185/255, blue: 84/255) // #1DB954
-    static let backgroundGray = Color(UIColor.systemGray6)
-    
-    // Cores das Redes Sociais
-    static let instaPink = Color(red: 225/255, green: 48/255, blue: 108/255)
-    static let facebookBlue = Color(red: 24/255, green: 119/255, blue: 242/255)
-    static let youtubeRed = Color(red: 255/255, green: 0/255, blue: 0/255)
-}
+// --- Constantes e Cores ---
 
-// --- HomeScreen Principal ---
+
+// Configurações Admin
+let ADMIN_EMAILS = ["martamartins340@gmail.com", "ivofernandes12@gmail.com"]
+let TARGET_WHATSAPP_NUMBER = "351912345678"
+
 struct HomeScreen: View {
-    // Instancia o ViewModel
     @StateObject private var viewModel = HomeViewModel()
+    @EnvironmentObject var sessionViewModel: SessionViewModel
     
     var body: some View {
         ZStack {
-            // Fundo cinza para destacar os cards
-            Color.backgroundGray.ignoresSafeArea()
+            // MUDANÇA: Fundo Branco
+            Color.white.ignoresSafeArea()
             
             switch viewModel.uiState {
             case .loading:
                 ProgressView()
-                    .scaleEffect(1.5)
+                    .tint(.accentPurple) // Cor personalizada para o loader
                 
             case .error(let message):
                 VStack {
-                    Image(systemName: "exclamationmark.triangle")
-                        .font(.largeTitle)
+                    Text("Erro ao carregar dados")
                         .foregroundColor(.red)
-                    Text("Erro: \(message)")
-                        .multilineTextAlignment(.center)
-                        .padding()
+                        .bold()
+                    Text(message)
+                        .font(.caption)
+                        .foregroundColor(.gray)
                 }
                 
-            case .success(let courses):
-                // Scroll Vertical Principal
-                ScrollView {
-                    VStack(spacing: 24) { // Espaçamento global entre secções
+            case .success(let items):
+                let coachingItems = items.filter { !$0.coachProgram.isEmpty }
+                let meditationItem = items.first { !$0.meditationCirclesType.isEmpty }
+                
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 24) {
                         
-                        // 1. Logo (AlmanaBocaLogo)
-                        // Substitui "fork.knife.circle" pelo nome do teu asset real quando tiveres
-                        Image(systemName: "fork.knife.circle")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(height: 80)
-                            .foregroundColor(.brandRed) // Usa a cor definida no LoginScreen
-                            .padding(.top, 16)
+                        // --- CABEÇALHO ---
+                        HStack {
                         
-                        // 2. Secção: Programas
+                            
+                            Spacer()
+                            
+                            // Botão Perfil (Menu)
+                            Button(action: {
+                                // Navegar para Perfil
+                            }) {
+                                Image(systemName: "person.circle")
+                                    .font(.system(size: 28))
+                                    .foregroundColor(.textDark)
+                            }
+                            .padding(.trailing, 16)
+                        }
+                        .overlay(alignment: .center) {
+                            
+                        }
+                        
+                        // --- SECÇÃO: PROGRAMAS ---
                         VStack(alignment: .leading, spacing: 16) {
-                            // Header (SummaryTopPageText)
-                            Text("Programas de Coaching") // R.string.lbl_coach_programs_available
+                            Text("Programas de Coaching Disponíveis")
                                 .font(.headline)
-                                .fontWeight(.bold)
+                                .bold()
+                                .foregroundColor(.textDark) // Forçar cor escura no fundo branco
                                 .padding(.horizontal)
                             
-                            if !courses.isEmpty {
-                                // LazyRow equivalente
+                            if !coachingItems.isEmpty {
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack(spacing: 16) {
-                                        ForEach(courses) { item in
+                                        ForEach(coachingItems) { item in
                                             ProgramCarouselCard(item: item)
                                         }
                                     }
-                                    .padding(.horizontal) // Padding nas pontas do scroll
-                                    .padding(.bottom, 10) // Espaço para a sombra não cortar
+                                    .padding(.horizontal)
                                 }
                             } else {
-                                Text("Não há programas disponíveis no momento.")
+                                Text("Não existem programas disponíveis de momento.")
                                     .font(.subheadline)
                                     .foregroundColor(.textGray)
                                     .padding(.horizontal)
                             }
                         }
                         
-                        // 3. Secção: Meditação
+                        // --- SECÇÃO: MEDITAÇÃO ---
                         VStack(alignment: .leading, spacing: 16) {
-                            Text("Círculos de Meditação") // R.string.lbl_meditations_circles
+                            Text("Círculos de Meditação")
                                 .font(.headline)
-                                .fontWeight(.bold)
+                                .bold()
+                                .foregroundColor(.textDark)
                                 .padding(.horizontal)
                             
-                            MeditationCircleCard()
+                            if let medItem = meditationItem {
+                                MeditationCircleCard(
+                                    item: medItem,
+                                    userName: sessionViewModel.currentUser?.name ?? "Alguém"
+                                )
                                 .padding(.horizontal)
+                            } else {
+                                Text("Novas datas em breve.")
+                                    .foregroundColor(.textGray)
+                                    .padding(.horizontal)
+                            }
                         }
                         
-                        // 4. Secção: Redes Sociais & Spotify
+                        // --- SECÇÃO: SOBRE MIM ---
                         VStack(alignment: .leading, spacing: 16) {
-                            Text("Encontra-me") // R.string.lbl_find_me
+                            Text("Sobre Mim")
                                 .font(.headline)
-                                .fontWeight(.bold)
+                                .bold()
+                                .foregroundColor(.textDark)
                                 .padding(.horizontal)
                             
-                            SocialMediaCard(
-                                instagramUrl: "https://instagram.com/almanaboca",
-                                facebookUrl: "https://facebook.com/almanaboca",
-                                youtubeUrl: "https://youtube.com/@almanaboca"
-                            )
+                            HStack(alignment: .top, spacing: 16) {
+                                Image("marta_photo")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 110, height: 110)
+                                    .clipShape(Circle())
+                                    .shadow(radius: 3) // Sombra leve na foto
+                                
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("Olá, eu sou a Marta!")
+                                        .font(.headline)
+                                        .bold()
+                                        .foregroundColor(.textDark)
+                                    
+                                    Text("A minha missão é ajudar-te a encontrar a tua voz e o teu equilíbrio...")
+                                        .font(.caption)
+                                        .foregroundColor(.textGray)
+                                        .lineLimit(5)
+                                }
+                            }
                             .padding(.horizontal)
-                            
-                            SpotifyButton(spotifyUrl: "https://open.spotify.com/show/trupodcast")
-                                .padding(.horizontal)
                         }
                         
-                        // Espaço extra no fundo (equivalente ao Spacer(100.dp))
+                        // --- REDES SOCIAIS & SPOTIFY ---
+                        SocialMediaRow(
+                            instagram: "https://instagram.com/almanaboca",
+                            facebook: "https://facebook.com/almanaboca",
+                            youtube: "https://youtube.com/@almanaboca"
+                        )
+                        .padding(.horizontal)
+                        
+                        SpotifyButton(url: "https://open.spotify.com/show/trupodcast")
+                            .padding(.horizontal)
+                        
                         Spacer().frame(height: 100)
                     }
+                    .padding(.vertical)
                 }
             }
         }
     }
+    
+    func checkAdminAccess() {
+        let email = sessionViewModel.currentUser?.email ?? ""
+        if ADMIN_EMAILS.contains(email) {
+            print("Bem-vinda Admin!")
+        }
+    }
 }
 
-// MARK: - Componentes Auxiliares
+// MARK: - Subcomponentes
 
-// --- Card do Programa (Carrossel) ---
 struct ProgramCarouselCard: View {
     let item: HomeItem
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Título
-            Text(item.coachProgram.isEmpty ? "Programa de Coaching" : item.coachProgram)
+            Text(item.coachProgram.isEmpty ? "Programa" : item.coachProgram)
                 .font(.title3)
-                .fontWeight(.bold)
+                .bold()
+                .foregroundColor(.textDark)
                 .lineLimit(2)
-                .foregroundColor(.black)
             
-            // Descrição
-            Text(item.whatToExpectProgram.isEmpty ? "Sem descrição disponível." : item.whatToExpectProgram)
+            Text(item.whatToExpectProgram.isEmpty ? "Sem descrição." : item.whatToExpectProgram)
                 .font(.caption)
                 .foregroundColor(.textGray)
                 .lineLimit(4)
-                .multilineTextAlignment(.leading)
             
             Divider()
             
-            // Datas (Ícone Calendar)
-            DetailRowSmall(iconName: "calendar", text: "\(item.coachDateStart) - \(item.coachDateEnd)")
+            DetailRowSmall(icon: "calendar", text: item.coachStartDate.isEmpty ? "Datas a anunciar" : "\(item.coachStartDate) - \(item.coachDateEnd)")
             
-            // Vagas (Ícone Groups -> person.3)
-            DetailRowSmall(iconName: "person.3", text: "\(item.coachVacancies) vagas restantes")
+            DetailRowSmall(icon: "person.2", text: "\(item.coachVacancies) vagas restantes")
             
-            // Desconto (Ícone LocalOffer -> tag.fill)
             if item.coachDiscount > 0 {
                 HStack {
                     Image(systemName: "tag.fill")
-                        .font(.caption)
+                        .resizable()
+                        .frame(width: 12, height: 12)
                     Text("\(Int(item.coachDiscount))% OFF")
                         .font(.caption)
-                        .fontWeight(.bold)
+                        .bold()
                 }
                 .padding(8)
                 .background(Color.promoYellowBg)
                 .foregroundColor(.promoYellowText)
                 .cornerRadius(8)
-                .padding(.top, 4)
             }
         }
         .padding(16)
-        .frame(width: 300) // Largura fixa
-        .background(Color.cardWhite)
+        .frame(width: 300)
+        // Sombra mais suave para fundo branco
+        .background(Color.white)
         .cornerRadius(16)
-        // Sombra (Elevation)
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+        // Borda subtil para destacar do fundo branco
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.gray.opacity(0.1), lineWidth: 1)
+        )
     }
 }
 
-// --- Card de Meditação ---
 struct MeditationCircleCard: View {
+    let item: HomeItem
+    let userName: String
+    
+    var sessionState: (text: String, isOpen: Bool) {
+        let dateString = item.meditationCirclesNextSession.trimmingCharacters(in: .whitespacesAndNewlines)
+        if dateString.isEmpty { return ("Data a definir", false) }
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd/MM/yyyy"
+        
+        if let date = formatter.date(from: dateString) {
+            if date < Date() { return ("Data a definir", false) }
+            let deadline = Calendar.current.date(bySettingHour: 11, minute: 30, second: 0, of: date) ?? date
+            let isOpen = Date() < deadline
+            return ("Próxima: \(dateString)", isOpen)
+        }
+        
+        formatter.dateFormat = "dd.MM.yyyy"
+        if let date = formatter.date(from: dateString) {
+             if date < Date() { return ("Data a definir", false) }
+             return ("Próxima: \(dateString)", true)
+        }
+        
+        return ("Data a definir", false)
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Meditações em Grupo") // R.string.lbl_meditations_in_group
+            Text(item.meditationCirclesType.isEmpty ? "Meditações em Grupo" : item.meditationCirclesType)
                 .font(.title3)
-                .fontWeight(.bold)
-                .foregroundColor(.black)
+                .bold()
+                .foregroundColor(.textDark)
             
-            Text("Sem descrição disponível.")
+            Text(item.meditationCirclesDesc.isEmpty ? "Junta-te a nós..." : item.meditationCirclesDesc)
                 .font(.caption)
                 .foregroundColor(.textGray)
-                .lineLimit(4)
             
             Divider()
             
-            DetailRowSmall(iconName: "calendar", text: "31/01/2026")
+            DetailRowSmall(icon: "calendar", text: sessionState.text)
+            DetailRowSmall(icon: "mappin.and.ellipse", text: item.meditationCirclesLocation)
             
-            DetailRowSmall(iconName: "mappin.and.ellipse", text: "Leve-me até lá")
+            if item.meditationCirclesPrice > 0 {
+                DetailRowSmall(icon: "eurosign.circle", text: String(format: "%.2f €", item.meditationCirclesPrice))
+            }
+            
+            Button(action: {
+                openWhatsApp()
+            }) {
+                HStack {
+                    Image(systemName: "paperplane.fill")
+                    Text(sessionState.isOpen ? "INSCREVER AGORA" : "INSCRIÇÕES FECHADAS")
+                        .bold()
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(sessionState.isOpen ? Color.whatsAppGreen : Color.gray)
+                .foregroundColor(.white)
+                .cornerRadius(8)
+            }
+            .disabled(!sessionState.isOpen)
         }
         .padding(16)
-        .frame(maxWidth: .infinity) // Ocupa a largura total
-        .background(Color.cardWhite)
+        .background(Color.white)
         .cornerRadius(20)
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(Color.gray.opacity(0.1), lineWidth: 1)
+        )
+    }
+    
+    func openWhatsApp() {
+        let message = "Nome: \(userName), conta comigo."
+        let urlString = "https://wa.me/\(TARGET_WHATSAPP_NUMBER)?text=\(message.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"
+        
+        if let url = URL(string: urlString) {
+            UIApplication.shared.open(url)
+        }
     }
 }
 
-// --- Card Redes Sociais ---
-struct SocialMediaCard: View {
-    let instagramUrl: String
-    let facebookUrl: String
-    let youtubeUrl: String
+struct DetailRowSmall: View {
+    let icon: String
+    let text: String
     
     var body: some View {
         HStack {
-            // O Spacer e o distribution funcionam automaticamente no HStack
-            Spacer()
-            SocialIconItem(iconName: "link", color: .instaPink, url: instagramUrl)
-            Spacer()
-            SocialIconItem(iconName: "link", color: .facebookBlue, url: facebookUrl)
-            Spacer()
-            SocialIconItem(iconName: "link", color: .youtubeRed, url: youtubeUrl)
-            Spacer()
+            Image(systemName: icon)
+                .foregroundColor(.accentPurple)
+                .frame(width: 20)
+            Text(text)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundColor(.textDark)
         }
-        .padding(.vertical, 24)
-        .background(Color.cardWhite)
-        .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
     }
 }
 
-struct SocialIconItem: View {
-    let iconName: String // SF Symbol name
+struct SocialMediaRow: View {
+    let instagram: String
+    let facebook: String
+    let youtube: String
+    
+    var body: some View {
+        HStack {
+            Spacer()
+            SocialIcon(icon: "link", color: .pink, url: instagram)
+            Spacer()
+            SocialIcon(icon: "link", color: .blue, url: facebook)
+            Spacer()
+            SocialIcon(icon: "play.rectangle.fill", color: .red, url: youtube)
+            Spacer()
+        }
+        .padding(.vertical, 8)
+    }
+}
+
+struct SocialIcon: View {
+    let icon: String
     let color: Color
     let url: String
     
     var body: some View {
-        // Link nativo do SwiftUI (substitui o UriHandler)
-        Link(destination: URL(string: url) ?? URL(string: "https://google.com")!) {
-            Image(systemName: iconName)
+        Button(action: {
+            if let link = URL(string: url) { UIApplication.shared.open(link) }
+        }) {
+            Image(systemName: icon)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 32, height: 32)
                 .foregroundColor(color)
-                .padding(8) // Aumenta a área de toque
         }
     }
 }
 
-// --- Botão Spotify ---
 struct SpotifyButton: View {
-    let spotifyUrl: String
+    let url: String
     
     var body: some View {
-        Link(destination: URL(string: spotifyUrl) ?? URL(string: "https://spotify.com")!) {
+        Button(action: {
+            if let link = URL(string: url) {
+                UIApplication.shared.open(link)
+            }
+        }) {
             HStack {
                 Image(systemName: "headphones")
                     .font(.title2)
+                
                 Spacer().frame(width: 12)
+                
                 Text("Ouve-me no Spotify")
-                    .font(.title3)
+                    .font(.headline)
                     .fontWeight(.bold)
             }
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
             .frame(height: 56)
             .background(Color.spotifyGreen)
-            .clipShape(Capsule()) // Botão totalmente redondo
-            .shadow(radius: 4)
+            .clipShape(Capsule())
+            .shadow(radius: 4, x: 0, y: 2)
         }
     }
 }
 
-// --- Linha de Detalhe (Pequena) ---
-struct DetailRowSmall: View {
-    let iconName: String
-    let text: String
-    
-    var body: some View {
-        HStack(alignment: .center) {
-            Image(systemName: iconName)
-                .font(.system(size: 18))
-                .foregroundColor(.black)
-                .frame(width: 20) // Largura fixa para alinhar ícones
-            
-            Spacer().frame(width: 8)
-            
-            Text(text)
-                .font(.body)
-                .fontWeight(.semibold)
-                .foregroundColor(.black)
-        }
-    }
+// Extensão para a cor do Spotify
+extension Color {
+    static let spotifyGreen = Color(red: 29/255, green: 185/255, blue: 84/255) // #1DB954
 }
 
-// MARK: - Preview
+// MARK: - Previews
+// ISTO PREVINE O CRASH NO PREVIEW DO XCODE
 struct HomeScreen_Previews: PreviewProvider {
     static var previews: some View {
         HomeScreen()
+            .environmentObject(SessionViewModel()) // <--- AQUI ESTÁ A CORREÇÃO PARA O PREVIEW
     }
 }

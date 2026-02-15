@@ -5,7 +5,7 @@
 
 import SwiftUI
 
-// 1. Enum para definir as Tabs (Substitui a sealed class BottomBarScreen)
+// 1. Enum para definir as Tabs
 enum TabItem: String, CaseIterable {
     case home
     case meditations
@@ -14,82 +14,68 @@ enum TabItem: String, CaseIterable {
     // Títulos
     var title: String {
         switch self {
-        case .home: return "Início" // R.string.lbl_btbar_home
-        case .meditations: return "Meditação" // R.string.lbl_btbar_meditation
-        case .booking: return "Agendar" // R.string.lbl_btbar_booking
+        case .home: return "Início"
+        case .meditations: return "Meditação"
+        case .booking: return "Agendar"
         }
     }
     
-    // Ícones (Estou a usar SF Symbols nativos da Apple como placeholder)
-    // Quando tiveres os teus ícones no Assets.xcassets, podes mudar para Image("nome_do_asset")
+    // Ícones (SF Symbols)
     var iconName: String {
         switch self {
-        case .home: return "house.fill" // R.drawable.ic_home
-        case .meditations: return "leaf.fill" // R.drawable.ic_meditation
-        case .booking: return "calendar" // R.drawable.ic_consultation
+        case .home: return "house.fill"
+        case .meditations: return "leaf.fill"
+        case .booking: return "calendar"
         }
     }
 }
 
 struct MenuScreen: View {
-    // Controla qual tab está ativa
+    // A App vai iniciar com o .home selecionado (que agora estará no meio)
     @State private var selectedTab: TabItem = .home
     
-    // Se precisares de acesso ao ViewModel aqui, podes injetar:
-    // @ObservedObject var sessionViewModel: SessionViewModel
-
     var body: some View {
-        // 2. TabView substitui o Scaffold + BottomNavigationBar + NavHost aninhado
         TabView(selection: $selectedTab) {
             
-            // Rota: Home
-            HomeScreen()
-                .tabItem {
-                    Label(TabItem.home.title, systemImage: TabItem.home.iconName)
-                }
-                .tag(TabItem.home) // Importante para o binding selection funcionar
-            
-            // Rota: Meditações
+            // --- POSIÇÃO 1 (ESQUERDA): Meditações ---
             MeditationsScreen()
                 .tabItem {
                     Label(TabItem.meditations.title, systemImage: TabItem.meditations.iconName)
                 }
                 .tag(TabItem.meditations)
             
-            // Rota: Booking
+            // --- POSIÇÃO 2 (MEIO): Home ---
+            HomeScreen()
+                .tabItem {
+                    Label(TabItem.home.title, systemImage: TabItem.home.iconName)
+                }
+                .tag(TabItem.home) // O Binding selection fará com que esta seja a ativa ao iniciar
+            
+            // --- POSIÇÃO 3 (DIREITA): Booking ---
             BookingScreen()
                 .tabItem {
                     Label(TabItem.booking.title, systemImage: TabItem.booking.iconName)
                 }
                 .tag(TabItem.booking)
         }
-        // Personalização da cor da TabBar (Opcional)
-        .tint(Color.brandRed) // Usa a cor vermelha que definimos antes quando selecionado
+        // Personalização da cor (Vermelho da marca)
+        .tint(Color.brandRed)
         .onAppear {
-            // Configurações extra de aparência da TabBar se necessário
             let appearance = UITabBarAppearance()
             appearance.configureWithOpaqueBackground()
             appearance.backgroundColor = UIColor.systemBackground
+            
+            // Aplica a aparência tanto ao scroll como ao estado normal
+            UITabBar.appearance().standardAppearance = appearance
             UITabBar.appearance().scrollEdgeAppearance = appearance
         }
     }
 }
 
-// MARK: - Sub-telas (Stubs para o código compilar)
-
-// Podes mover estas structs para ficheiros separados:
-// HomeScreen.swift, MeditationsScreen.swift, BookingScreen.swift
-
-
-
-
-// Pequeno helper para simular o Modifier do Compose, caso queiras manter a estrutura
-struct Modifier {
-    func fillMaxSize() -> Modifier { return self }
-}
-
+// MARK: - Previews
 struct MenuScreen_Previews: PreviewProvider {
     static var previews: some View {
         MenuScreen()
+            .environmentObject(SessionViewModel()) // Exemplo de injeção para preview
     }
 }

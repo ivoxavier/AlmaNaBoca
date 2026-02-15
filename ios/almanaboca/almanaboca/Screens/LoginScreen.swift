@@ -6,9 +6,7 @@
 import SwiftUI
 
 // Definição da cor da marca
-extension Color {
-    static let brandRed = Color(red: 158/255, green: 25/255, blue: 25/255)
-}
+
 
 struct LoginScreen: View {
     // Parâmetros recebidos

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		787BF4B02F3BECBB007F3DFB /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 787BF4AF2F3BECBB007F3DFB /* FirebaseCore */; };
 		787BF4B22F3BED6C007F3DFB /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 787BF4B12F3BED6C007F3DFB /* FirebaseAuth */; };
+		787BF4B72F42691E007F3DFB /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 787BF4B62F42691E007F3DFB /* FirebaseFirestore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +60,7 @@
 			files = (
 				787BF4B02F3BECBB007F3DFB /* FirebaseCore in Frameworks */,
 				787BF4B22F3BED6C007F3DFB /* FirebaseAuth in Frameworks */,
+				787BF4B72F42691E007F3DFB /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -129,6 +131,7 @@
 			packageProductDependencies = (
 				787BF4AF2F3BECBB007F3DFB /* FirebaseCore */,
 				787BF4B12F3BED6C007F3DFB /* FirebaseAuth */,
+				787BF4B62F42691E007F3DFB /* FirebaseFirestore */,
 			);
 			productName = almanaboca;
 			productReference = 78952BBA2F14144F00BB8208 /* almanaboca.app */;
@@ -600,6 +603,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 787BF4AD2F3BEB1B007F3DFB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAuth;
+		};
+		787BF4B62F42691E007F3DFB /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 787BF4AD2F3BEB1B007F3DFB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

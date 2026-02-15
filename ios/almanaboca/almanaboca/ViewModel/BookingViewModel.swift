@@ -1,81 +1,122 @@
-import Foundation
 import SwiftUI
-
-// --- Modelos ---
-enum BookingStatus {
-    case confirmed
-    case pending
-}
-
-struct BookingItem: Identifiable, Hashable {
-    let id: String
-    let serviceName: String
-    let date: String
-    let time: String
-    let status: BookingStatus
-}
-
-// Estado específico para esta tela
-enum BookingUiState: Equatable {
-    case loading
-    case success
-    case error(String)
-}
+import FirebaseAuth
+import FirebaseFirestore
 
 @MainActor
 class BookingViewModel: ObservableObject {
     
-    @Published var uiState: BookingUiState = .loading
+    private let db = Firestore.firestore()
     
-    // Lista de marcações (Mutável para podermos apagar items)
-    @Published var bookings: [BookingItem] = []
+    @Published var bookings: [Booking] = []
+    @Published var occupiedSlots: [String] = []
+    @Published var isLoading = false
+    @Published var alertMessage: String = ""
+    @Published var showAlert: Bool = false
     
-    init() {
-        fetchBookings()
+    // CORREÇÃO: Usar o ficheiro Constants
+    var isAdmin: Bool {
+        let email = Auth.auth().currentUser?.email ?? ""
+        return AlmanabocaConstants.adminEmails.contains(email)
     }
     
-    func fetchBookings() {
-        self.uiState = .loading
+    func loadData() {
+        self.isLoading = true
         
         Task {
+            // Garante que o loading pára sempre
+            defer { self.isLoading = false }
+            
             do {
-                // Simula delay de rede
-                try await Task.sleep(nanoseconds: 1_000_000_000)
-                
-                // Dados Fictícios
-                self.bookings = [
-                    BookingItem(id: "1", serviceName: "Sessão de Coaching Executivo", date: "12 Fev 2026", time: "14:30", status: .confirmed),
-                    BookingItem(id: "2", serviceName: "Mentoria de Carreira", date: "28 Fev 2026", time: "10:00", status: .pending),
-                    BookingItem(id: "3", serviceName: "Círculo de Meditação", date: "05 Mar 2026", time: "18:00", status: .confirmed)
-                ]
-                
-                self.uiState = .success
+                if isAdmin {
+                    let snapshot = try await db.collection("bookings")
+                        .whereField("status", isEqualTo: "pending")
+                        .getDocuments()
+                    self.bookings = snapshot.documents.compactMap { try? $0.data(as: Booking.self) }
+                } else {
+                    guard let email = Auth.auth().currentUser?.email else { return }
+                    
+                    let snapshot = try await db.collection("bookings")
+                        .whereField("clientEmail", isEqualTo: email)
+                        .getDocuments()
+                    
+                    let all = snapshot.documents.compactMap { try? $0.data(as: Booking.self) }
+                    
+                    // Ordena por data (recente primeiro)
+                    self.bookings = all.sorted { $0.date > $1.date }
+                }
             } catch {
-                self.uiState = .error("Erro ao carregar marcações")
+                print("Erro: \(error)")
             }
         }
     }
     
-    func cancelBooking(_ item: BookingItem) {
-        // Remove da lista localmente
-        if let index = bookings.firstIndex(where: { $0.id == item.id }) {
-            bookings.remove(at: index)
+    // --- LÓGICA DE DISPONIBILIDADE ---
+    func checkAvailability(for date: Date) {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yyyy"
+        let dateString = formatter.string(from: date)
+        
+        Task {
+            do {
+                let snapshot = try await db.collection("bookings")
+                    .whereField("date", isEqualTo: dateString)
+                    .getDocuments()
+                
+                let items = snapshot.documents.compactMap { try? $0.data(as: Booking.self) }
+                // Só bloqueia se não estiver rejeitado
+                self.occupiedSlots = items
+                    .filter { $0.status != "rejected" }
+                    .map { $0.time }
+            } catch { print(error) }
         }
     }
     
-    func addNewBooking(date: Date) {
-        // Lógica fictícia para adicionar nova marcação após selecionar data
+    // --- CRIAR ---
+    func createBooking(date: Date, time: String, name: String, phone: String, service: String) {
+        guard let userEmail = Auth.auth().currentUser?.email else { return }
+        self.isLoading = true
+        
         let formatter = DateFormatter()
-        formatter.dateFormat = "dd MMM yyyy"
+        formatter.dateFormat = "dd.MM.yyyy"
         let dateString = formatter.string(from: date)
         
-        let newItem = BookingItem(
-            id: UUID().uuidString,
-            serviceName: "Nova Consulta (Demo)",
+        let newBooking = Booking(
             date: dateString,
-            time: "09:00",
-            status: .pending
+            time: time,
+            serviceType: service,
+            clientName: name,
+            clientEmail: userEmail,
+            clientPhone: phone,
+            status: "pending"
         )
-        bookings.append(newItem)
+        
+        Task {
+            do {
+                try db.collection("bookings").addDocument(from: newBooking)
+                self.alertMessage = "Sucesso! Aguarda confirmação."
+                self.showAlert = true
+                self.loadData()
+            } catch {
+                self.alertMessage = "Erro: \(error.localizedDescription)"
+                self.showAlert = true
+            }
+            self.isLoading = false
+        }
+    }
+    
+    func cancelBooking(_ booking: Booking) {
+        guard let id = booking.id else { return }
+        Task {
+            try? await db.collection("bookings").document(id).delete()
+            loadData()
+        }
+    }
+    
+    func updateBookingStatus(_ booking: Booking, newStatus: String) {
+        guard let id = booking.id else { return }
+        Task {
+            try? await db.collection("bookings").document(id).updateData(["status": newStatus])
+            loadData()
+        }
     }
 }
