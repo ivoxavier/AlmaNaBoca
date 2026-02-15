@@ -13,7 +13,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.Headphones
@@ -48,9 +50,7 @@ import com.ixsvf.almanaboca.viewmodel.SessionViewModel
 import java.net.URLEncoder
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 // --- Cores ---
 private val CardWhite = Color.White
@@ -78,6 +78,9 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsState()
     val currentUser by sessionViewModel.currentUser.collectAsState()
 
+    // Estado para controlar o menu de opções (Logout)
+    var showMenu by remember { mutableStateOf(false) }
+
     // Obter o nome do utilizador para usar na mensagem do WhatsApp
     val userName = currentUser?.displayName ?: "Alguém"
 
@@ -102,22 +105,45 @@ fun HomeScreen(
             is HomeUiState.Success -> {
                 Column(modifier = Modifier.verticalScroll(scrollState)) {
 
-                    // --- LOGÓTIPO COM GATILHO SECRETO ---
+                    // --- CABEÇALHO: LOGÓTIPO + MENU LOGOUT ---
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .combinedClickable(
-                                onClick = { },
-                                onLongClick = {
-                                    val email = currentUser?.email ?: ""
-                                    if (ADMIN_EMAILS.contains(email)) {
-                                        Toast.makeText(context, "Bem-vinda Admin!", Toast.LENGTH_SHORT).show()
-                                        navController.navigate("admin_bookings")
-                                    }
-                                }
-                            )
+                            .padding(top = 8.dp, bottom = 8.dp)
                     ) {
-                        //AlmanaBocaLogo()
+                        // 1. O Logótipo (com o gatilho secreto de Admin)
+                        // Usamos Alignment.Center para garantir que o logo fica no meio
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .combinedClickable(
+                                    onClick = { },
+                                    onLongClick = {
+                                        val email = currentUser?.email ?: ""
+                                        if (ADMIN_EMAILS.contains(email)) {
+                                            Toast.makeText(context, "Bem-vinda Admin!", Toast.LENGTH_SHORT).show()
+                                            navController.navigate("admin_bookings")
+                                        }
+                                    }
+                                )
+                        ) {
+                            //AlmanaBocaLogo()
+                        }
+
+                        // 2. O Ícone de Menu (Três Pontinhos) no topo direito
+                        IconButton(
+                            onClick = { navController.navigate("user_screen") },
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                                .padding(end = 8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.AccountCircle,
+                                contentDescription = "Perfil",
+                                tint = TextDark,
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
                     }
 
                     // --- CONTEÚDO ---

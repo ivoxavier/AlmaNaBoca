@@ -1,6 +1,7 @@
 package com.ixsvf.almanaboca.viewmodel
 
 import android.app.Application
+import androidx.datastore.dataStore
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -9,6 +10,7 @@ import com.google.firebase.firestore.FirebaseFirestore // <--- IMPORTANTE: Falta
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.messaging.FirebaseMessaging
 import com.ixsvf.almanaboca.constants.AlmanaBocaConstants
+import com.ixsvf.almanaboca.services.repository.UserPreferences
 import com.ixsvf.almanaboca.ui.theme.states.LoginUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +20,7 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
-    // --- CORREÇÃO: Inicializar o Firestore aqui ---
+    private val userPreferences = UserPreferences(application)
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
 
     // Estado da UI (Loading, Success, Error)
@@ -57,10 +59,19 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
     }
 
     // Função para fazer logout (útil para o menu)
-    fun logout() {
-        auth.signOut()
-        _currentUser.value = null
-        _uiState.value = LoginUiState.Idle
+    // --- CORREÇÃO DO SIGNOUT ---
+    fun signOut() {
+        viewModelScope.launch {
+            // 1. Limpar o DataStore (Apaga os dados do telemóvel)
+            userPreferences.clearSession()
+
+            // 2. Fazer Logout do Firebase
+            auth.signOut()
+
+            // 3. Resetar estados
+            _currentUser.value = null
+            _uiState.value = LoginUiState.Idle
+        }
     }
 
     fun updateFcmToken(email: String) {
