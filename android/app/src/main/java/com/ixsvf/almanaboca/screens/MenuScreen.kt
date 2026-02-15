@@ -33,9 +33,8 @@ sealed class BottomBarScreen(
 
 @Composable
 fun MenuScreen(
-    rootNavController: NavHostController // Este serve para ir para o Login ou Admin
+    rootNavController: NavHostController
 ) {
-    // 1. CRIAR UM NOVO CONTROLADOR APENAS PARA AS ABAS (Resolve o Crash)
     val bottomNavController = rememberNavController()
 
     Scaffold(
@@ -43,7 +42,6 @@ fun MenuScreen(
             BottomNavigationBar(navController = bottomNavController)
         }
     ) { innerPadding ->
-        // Passamos os dois controladores
         MenuNavHost(
             bottomNavController = bottomNavController,
             rootNavController = rootNavController,
@@ -63,15 +61,24 @@ fun MenuNavHost(
         startDestination = BottomBarScreen.Home.route,
         modifier = modifier
     ) {
+        // --- AQUI ESTAVA O ERRO ---
         composable(route = BottomBarScreen.Meditations.route) {
-            MeditationsScreen(modifier = Modifier.fillMaxSize())
+            MeditationsScreen(
+                modifier = Modifier.fillMaxSize(),
+                onVideoClick = { videoId ->
+                    // AQUI VOCÊ DEVE NAVEGAR PARA O PLAYER
+                    // Como o player deve abrir "por cima" de tudo, usamos o rootNavController
+                    // rootNavController.navigate("player/$videoId")
+
+                    // (Por enquanto deixamos vazio ou com um log, até criares a rota do player)
+                    android.util.Log.d("MenuScreen", "Abrir vídeo: $videoId")
+                }
+            )
         }
 
         composable(route = BottomBarScreen.Home.route) {
             HomeScreen(
                 modifier = Modifier.fillMaxSize(),
-                // IMPORTANTE: Passamos o 'rootNavController' para o HomeScreen
-                // porque é ele que sabe ir para o ecrã de "admin_bookings"
                 navController = rootNavController
             )
         }

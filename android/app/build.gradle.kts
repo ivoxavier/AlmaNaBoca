@@ -93,4 +93,10 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.firebase.messaging)
+    implementation(libs.coil.compose)
+    implementation(libs.android.youtube.player)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.gson)
 }
