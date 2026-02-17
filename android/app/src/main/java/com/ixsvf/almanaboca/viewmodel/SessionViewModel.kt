@@ -1,6 +1,8 @@
 package com.ixsvf.almanaboca.viewmodel
 
 import android.app.Application
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.datastore.dataStore
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,9 +29,23 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
     private val _uiState = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
     val uiState = _uiState.asStateFlow()
 
+    private val _canAccessChat = mutableStateOf(false)
+    val canAccessChat: State<Boolean> = _canAccessChat
+
     // Estado do Utilizador Atual (para verificar admins, etc)
     private val _currentUser = MutableStateFlow<FirebaseUser?>(auth.currentUser)
     val currentUser = _currentUser.asStateFlow()
+
+    private val _userName = MutableStateFlow<String>("")
+    val userName = _userName.asStateFlow()
+
+
+    init {
+        // Se já houver um user ao iniciar, verifica logo o acesso
+        checkChatAccess()
+    }
+
+
 
     fun login(email: String, pass: String) {
         // 1. Validação básica
@@ -106,5 +122,34 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
                 FirebaseMessaging.getInstance().unsubscribeFromTopic("admin_notifications")
             }
         }
+    }
+
+    fun checkChatAccess() {
+        val uid = auth.currentUser?.uid ?: return
+
+        db.collection("users").document(uid)
+            .get()
+            .addOnSuccessListener { doc ->
+                // 1. Verifica Acesso
+                val hasAccess = doc.getBoolean("hasChat") ?: false
+                _canAccessChat.value = hasAccess
+
+                // 2. Lê o NOME do Firestore
+                // Se não existir campo 'name', tenta usar o DisplayName do Auth ou "Utilizador"
+                val firestoreName = doc.getString("name")
+                val authName = auth.currentUser?.displayName
+
+                _userName.value = firestoreName ?: authName ?: "Utilizador"
+
+                // 3. Gere notificações
+                if (hasAccess) {
+                    FirebaseMessaging.getInstance().subscribeToTopic("community_chat")
+                } else {
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic("community_chat")
+                }
+            }
+            .addOnFailureListener {
+                _canAccessChat.value = false
+            }
     }
 }

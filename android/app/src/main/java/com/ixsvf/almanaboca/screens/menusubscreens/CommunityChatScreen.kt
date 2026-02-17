@@ -37,6 +37,8 @@ fun CommunityChatScreen(
 ) {
     val messages by chatViewModel.messages
     val currentUser by sessionViewModel.currentUser.collectAsState()
+    val realName by sessionViewModel.userName.collectAsState()
+
     var messageText by remember { mutableStateOf("") }
     val scrollState = rememberLazyListState()
 
@@ -70,10 +72,7 @@ fun CommunityChatScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 contentPadding = PaddingValues(vertical = 16.dp)
             ) {
-                items(
-                    items = messages,
-                    key = { it.id } // Usar o ID como chave ajuda o Compose nas animações
-                ) { msg ->
+                items(items = messages) { msg ->
                     // --- ANIMAÇÃO DE ENTRADA ---
                     AnimatedVisibility(
                         visible = true,
@@ -123,10 +122,16 @@ fun CommunityChatScreen(
                     IconButton(
                         onClick = {
                             if (messageText.isNotBlank()) {
+                                // LÓGICA DE NOME MELHORADA
+                                // Tenta o nome -> se não tiver, tenta a parte do email antes do @ -> se não, "Anónimo"
+                                /*val senderName = currentUser?.displayName?.takeIf { it.isNotBlank() }
+                                    ?: currentUser?.email?.substringBefore("@")
+                                    ?: "Anónimo"*/
+
                                 chatViewModel.sendMessage(
                                     messageText,
                                     currentUser?.uid ?: "",
-                                    currentUser?.displayName ?: "Utilizador"
+                                    realName // <--- Agora enviamos sempre um nome válido
                                 )
                                 messageText = ""
                             }
@@ -160,48 +165,71 @@ fun ChatBubble(msg: ChatMessage, isMine: Boolean) {
         java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(date)
     }
 
+    // Cores de segurança caso não tenhas definido
+    val nameColor = Color(0xFF7C4DFF) // AccentPurple
+    val bubbleColorMine = Color(0xFF7C4DFF)
+    val bubbleColorOther = Color.White
+
     Column(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
         horizontalAlignment = if (isMine) Alignment.End else Alignment.Start
     ) {
+        // --- NOME DO REMETENTE ---
+        // Se quiseres ver o TEU nome também, remove o "if (!isMine)"
         if (!isMine) {
             Text(
-                text = msg.senderName,
-                fontSize = 11.sp,
+                text = msg.senderName.ifBlank { "Desconhecido" }, // Fallback visual
+                fontSize = 12.sp, // Aumentei ligeiramente para ler melhor
                 fontWeight = FontWeight.Bold,
-                color = AccentPurple,
-                modifier = Modifier.padding(start = 8.dp, bottom = 2.dp)
+                color = nameColor,
+                modifier = Modifier.padding(start = 12.dp, bottom = 4.dp) // Ajustei padding para alinhar com a bolha
             )
         }
 
+        // --- BOLHA DE TEXTO ---
         Row(
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = if (isMine) Arrangement.End else Arrangement.Start
         ) {
+            // Hora à esquerda (se for minha mensagem)
             if (isMine) {
-                Text(timeFormatted, fontSize = 10.sp, color = Color.Gray, modifier = Modifier.padding(end = 6.dp, bottom = 2.dp))
-            }
-
-            Surface(
-                color = if (isMine) AccentPurple else Color.White,
-                shape = RoundedCornerShape(
-                    topStart = 16.dp, topEnd = 16.dp,
-                    bottomStart = if (isMine) 16.dp else 2.dp,
-                    bottomEnd = if (isMine) 2.dp else 16.dp
-                ),
-                tonalElevation = 2.dp,
-                shadowElevation = 1.dp
-            ) {
                 Text(
-                    text = msg.text,
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                    color = if (isMine) Color.White else TextDark,
-                    fontSize = 15.sp
+                    text = timeFormatted,
+                    fontSize = 10.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(end = 8.dp, bottom = 4.dp)
                 )
             }
 
+            Surface(
+                color = if (isMine) bubbleColorMine else bubbleColorOther,
+                shape = RoundedCornerShape(
+                    topStart = 18.dp,
+                    topEnd = 18.dp,
+                    bottomStart = if (isMine) 18.dp else 4.dp, // Ponta da bolha ajustada
+                    bottomEnd = if (isMine) 4.dp else 18.dp
+                ),
+                tonalElevation = 2.dp,
+                shadowElevation = 2.dp
+            ) {
+                Text(
+                    text = msg.text,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                    color = if (isMine) Color.White else Color(0xFF1F2937),
+                    fontSize = 16.sp
+                )
+            }
+
+            // Hora à direita (se for mensagem de outro)
             if (!isMine) {
-                Text(timeFormatted, fontSize = 10.sp, color = Color.Gray, modifier = Modifier.padding(start = 6.dp, bottom = 2.dp))
+                Text(
+                    text = timeFormatted,
+                    fontSize = 10.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
+                )
             }
         }
     }

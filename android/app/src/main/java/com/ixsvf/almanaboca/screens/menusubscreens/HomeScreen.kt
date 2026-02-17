@@ -180,7 +180,16 @@ fun HomeScreen(
 
                         PaddingBox { SummaryTopPageText(stringResource(R.string.lbl_comunities)) }
                         PaddingBox {
-                            CommunityCard(onClick = { navController.navigate("community_chat") })
+                            CommunityCard(onClick = {
+
+                                    if (sessionViewModel.canAccessChat.value) {
+                                        navController.navigate("community_chat")
+                                    } else {
+                                        Toast.makeText(context, "Esta funcionalidade requer subscrição ativa.", Toast.LENGTH_LONG).show()
+                                        // Aqui poderias navegar para um ecrã de pagamento
+                                    }
+                                }
+                            )
                         }
 
                         Spacer(modifier = Modifier.height(12.dp))
