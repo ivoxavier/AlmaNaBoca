@@ -181,14 +181,19 @@ fun HomeScreen(
                         PaddingBox { SummaryTopPageText(stringResource(R.string.lbl_comunities)) }
                         PaddingBox {
                             CommunityCard(onClick = {
-
-                                    if (sessionViewModel.canAccessChat.value) {
+                                // Mostra feedback visual que está a verificar (opcional, mas bom UX)
+                                // Aqui fazemos a verificação em tempo real:
+                                sessionViewModel.verifyAccessNow(
+                                    onSuccess = {
+                                        // Se o Firebase disser que sim AGORA:
                                         navController.navigate("community_chat")
-                                    } else {
-                                        Toast.makeText(context, "Esta funcionalidade requer subscrição ativa.", Toast.LENGTH_LONG).show()
-                                        // Aqui poderias navegar para um ecrã de pagamento
+                                    },
+                                    onFailure = {
+                                        // Se o Firebase disser que não ou der erro:
+                                        Toast.makeText(context, "Acesso negado. Verifica a tua subscrição.", Toast.LENGTH_LONG).show()
                                     }
-                                }
+                                )
+                            }
                             )
                         }
 
@@ -222,7 +227,7 @@ fun HomeScreen(
                         }
 
                         PaddingBox { SpotifyButton("https://open.spotify.com/show/trupodcast") }
-                        Spacer(modifier = Modifier.height(100.dp))
+                        //Spacer(modifier = Modifier.height(100.dp))
                     }
                 }
             }

@@ -1,9 +1,11 @@
 package com.ixsvf.almanaboca.screens
 
+import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,10 +16,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
@@ -25,9 +34,10 @@ import com.ixsvf.almanaboca.R
 import com.ixsvf.almanaboca.screens.components.*
 import com.ixsvf.almanaboca.ui.theme.states.LoginUiState
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.launch
 
-// Cores atualizadas para o tema claro
-private val BrandRedMain = Color(0xFFC62828) // Vermelho da marca para botões/detalhes
+private val BrandRedMain = Color(0xFFC62828)
 
 @Composable
 fun LoginScreen(
@@ -40,7 +50,23 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     var isSplashFinished by remember { mutableStateOf(false) }
 
-    // Estado para controlar o Scroll
+    // Estado para controlar os Dialogs
+    var showPrivacyDialog by remember { mutableStateOf(false) }
+    var showForgotPasswordDialog by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+
+    val appVersion = remember {
+        try {
+            val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+            "v${packageInfo.versionName}"
+        } catch (e: Exception) {
+            ""
+        }
+    }
+
+
+
     val scrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
@@ -48,30 +74,42 @@ fun LoginScreen(
         if (currentUser != null) {
             onNavigateToHome()
         } else {
+            email = ""
+            password = ""
             delay(1000)
             isSplashFinished = true
         }
     }
 
+    // --- DIALOGS ---
+    if (showPrivacyDialog) {
+        PrivacyPolicyDialog(onDismiss = { showPrivacyDialog = false })
+    }
+
+    if (showForgotPasswordDialog) {
+        ForgotPasswordDialog(
+            initialEmail = email, // Passa o email que o user já escreveu (se houver)
+            onDismiss = { showForgotPasswordDialog = false }
+        )
+    }
+
     Surface(
         modifier = modifier.fillMaxSize(),
-        color = Color.White // Fundo Branco
+        color = Color.White
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White) // Garante fundo branco
+                .background(Color.White)
         ) {
-            // Mudei o ContentColor para Preto porque o fundo é branco
             CompositionLocalProvider(LocalContentColor provides Color.Black) {
 
                 if (!isSplashFinished) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        // LOGO NO SPLASH
                         Image(
                             painter = painterResource(id = R.drawable.almanaboca_white),
                             contentDescription = "Logo",
-                            modifier = Modifier.size(200.dp), // Ajusta o tamanho conforme necessário
+                            modifier = Modifier.size(280.dp),
                             contentScale = ContentScale.Fit
                         )
                     }
@@ -88,65 +126,66 @@ fun LoginScreen(
                         verticalArrangement = Arrangement.Center
                     ) {
 
-                        // LOGO NO TOPO DO FORMULÁRIO
                         Image(
                             painter = painterResource(id = R.drawable.almanaboca_white),
                             contentDescription = "Logo",
                             modifier = Modifier
-                                .height(120.dp) // Altura controlada
+                                .height(190.dp)
                                 .fillMaxWidth(),
                             contentScale = ContentScale.Fit
                         )
 
-                        Spacer(modifier = Modifier.height(40.dp))
+                        Text(
+                            text = stringResource(R.string.lbl_developed_by) + " Ivo Xavier<ixsvf>",
+                            color = Color.LightGray,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
 
-                        // Cartão do Formulário
+                        // TIP: SIGAM ATOMIC DESIGN SEMPRE QUE POSSIVEL
+                        // POR MAIS ESTUPIDO QUE POSSA PARECER
+                        //Spacer(modifier = Modifier.height(10.dp))
+                        BlankSpace(10)
+
+
                         AnimatedVisibility(
                             visible = true,
                             enter = fadeIn(tween(600)) + slideInVertically(tween(600)) { 40 }
                         ) {
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
-                                // Cor de fundo do cartão subtil (cinza muito claro) para contraste
                                 colors = CardDefaults.cardColors(containerColor = Color(0xFFF9F9F9)),
                                 shape = RoundedCornerShape(24.dp),
                                 border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.4f)),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp) // Sombra suave
+                                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                             ) {
                                 Column(
                                     modifier = Modifier.padding(24.dp),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Text(
-                                        text = "Bem-vindo(a)",
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color.Black // Texto Preto
-                                    )
 
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                    //Spacer(modifier = Modifier.height(8.dp))
+                                    BlankSpace(8)
 
                                     Text(
-                                        text = "Inicia sessão para continuar",
+                                        text = stringResource(R.string.lbl_login_to_account),
                                         fontSize = 14.sp,
-                                        color = Color.Gray // Texto Cinza
+                                        color = Color.Gray
                                     )
 
-                                    Spacer(modifier = Modifier.height(32.dp))
+                                    //Spacer(modifier = Modifier.height(32.dp))
+                                    BlankSpace(32)
 
-                                    // Email
                                     OutlinedTextComponent(
                                         value = email,
                                         onValueChange = { email = it },
                                         label = stringResource(R.string.lbl_account),
                                         singleLine = true
-                                        // Nota: Verifica se o OutlinedTextComponent suporta cores escuras por defeito,
-                                        // senão terás de passar a cor do texto/label para preto lá dentro.
                                     )
 
-                                    Spacer(modifier = Modifier.height(16.dp))
+                                    //Spacer(modifier = Modifier.height(16.dp))
+                                    BlankSpace(16)
 
-                                    // Password
                                     OutlinedTextComponent(
                                         value = password,
                                         onValueChange = { password = it },
@@ -157,14 +196,15 @@ fun LoginScreen(
                                     if (uiState is LoginUiState.Error) {
                                         Text(
                                             text = uiState.message,
-                                            color = BrandRedMain, // Vermelho para erro
+                                            color = BrandRedMain,
                                             fontSize = 12.sp,
                                             modifier = Modifier.padding(top = 16.dp),
                                             textAlign = TextAlign.Center
                                         )
                                     }
 
-                                    Spacer(modifier = Modifier.height(32.dp))
+                                    //Spacer(modifier = Modifier.height(32.dp))
+                                    BlankSpace(32)
 
                                     Box(
                                         modifier = Modifier.fillMaxWidth(),
@@ -178,7 +218,6 @@ fun LoginScreen(
                                                 }
                                             },
                                             enabled = uiState !is LoginUiState.Loading && email.isNotEmpty() && password.isNotEmpty()
-                                           
                                         )
 
                                         if (uiState is LoginUiState.Loading) {
@@ -189,20 +228,204 @@ fun LoginScreen(
                                             )
                                         }
                                     }
+
+                                    //Spacer(modifier = Modifier.height(16.dp))
+                                    BlankSpace(16)
+                                    PrivacyPolicyText(
+                                        onClick = { showPrivacyDialog = true }
+                                    )
                                 }
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        //Spacer(modifier = Modifier.height(20.dp))
+                        BlankSpace(16)
 
+                        // --- LINK RECUPERAR PASSWORD ---
                         Text(
                             text = stringResource(R.string.lbl_lost_password),
                             color = Color.Gray,
-                            fontSize = 14.sp
+                            fontSize = 14.sp,
+                            modifier = Modifier
+                                .clickable { showForgotPasswordDialog = true } // Abre o popup
+                                .padding(8.dp),
+                            textDecoration = TextDecoration.Underline // Sublinhado para parecer link
+                        )
+
+                        //Spacer(modifier = Modifier.height(5.dp))
+                        BlankSpace(5)
+
+
+                        Text(
+                            text = appVersion,
+                            color = Color.LightGray,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(bottom = 16.dp)
                         )
                     }
                 }
             }
         }
     }
+}
+
+// --- NOVO DIALOG: RECUPERAR PASSWORD ---
+@Composable
+fun ForgotPasswordDialog(
+    initialEmail: String,
+    onDismiss: () -> Unit
+) {
+    var email by remember { mutableStateOf(initialEmail) }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var successMessage by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    val msgTypeEmail = stringResource(R.string.lbl_type_email)
+    val msgCheckEmail = stringResource(R.string.lbl_check_your_email)
+    val msgError = stringResource(R.string.lbl_error)
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.lbl_recover_password), fontWeight = FontWeight.Bold) },
+        text = {
+            Column {
+                Text(stringResource(R.string.lbl_recover_password_email), fontSize = 14.sp)
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text(stringResource(R.string.lbl_email)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                if (errorMessage != null) {
+                    Text(text = errorMessage!!, color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp))
+                }
+                if (successMessage != null) {
+                    Text(text = successMessage!!, color = Color(0xFF2E7D32), fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp))
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    if (email.isBlank()) {
+                        errorMessage = msgTypeEmail
+                        return@Button
+                    }
+
+                    isLoading = true
+                    errorMessage = null
+
+                    scope.launch {
+                        try {
+                            FirebaseAuth.getInstance().sendPasswordResetEmail(email).await()
+                            successMessage = msgCheckEmail
+                            isLoading = false
+                            delay(2000) // Espera 2s para lerem a mensagem e fecha
+                            onDismiss()
+                        } catch (e: Exception) {
+                            isLoading = false
+                            errorMessage = msgError + " ${e.message}"
+                        }
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = BrandRedMain),
+                enabled = !isLoading
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(color = Color.White, modifier = Modifier.size(16.dp))
+                } else {
+                    Text(stringResource(R.string.lbl_send_email))
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.lbl_cancel), color = Color.Gray)
+            }
+        },
+        containerColor = Color.White,
+        shape = RoundedCornerShape(16.dp)
+    )
+}
+
+
+@Composable
+fun PrivacyPolicyText(onClick: () -> Unit) {
+    val annotatedString = buildAnnotatedString {
+        append(stringResource(R.string.lbl_rgpd_label_1))
+
+
+        val link = LinkAnnotation.Clickable(
+            tag = "privacy_policy",
+            styles = TextLinkStyles(
+                style = SpanStyle(
+                    color = BrandRedMain,
+                    fontWeight = FontWeight.Bold,
+                    textDecoration = TextDecoration.Underline
+                )
+            ),
+            linkInteractionListener = {
+                // Quando clicado, executa a ação
+                onClick()
+            }
+        )
+
+        // Aplicamos o link ao texto específico
+        withLink(link) {
+            append(" " + stringResource(R.string.lbl_rgpd_label_2) + " " )
+        }
+
+        append(stringResource(R.string.lbl_rgpd_label_3))
+    }
+
+    // Agora usamos o Text normal (o ClickableText desaparece)
+    Text(
+        text = annotatedString,
+        style = MaterialTheme.typography.bodySmall.copy(
+            color = Color.Gray,
+            textAlign = TextAlign.Center,
+            fontSize = 11.sp
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 4.dp)
+    )
+}
+
+@Composable
+fun PrivacyPolicyDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.lbl_rgpd_label_2), fontWeight = FontWeight.Bold) },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 400.dp) // Limita a altura
+                    .verticalScroll(rememberScrollState()) // Permite scroll se o texto for longo
+            ) {
+                Text(
+                    text =stringResource(R.string.lbl_rgpd_disclaimer).trimIndent(),
+                    fontSize = 14.sp,
+                    color = Color.Black
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(containerColor = BrandRedMain)
+            ) {
+                Text(stringResource(R.string.lbl_close), color = Color.White)
+            }
+        },
+        containerColor = Color.White,
+        shape = RoundedCornerShape(16.dp)
+    )
 }

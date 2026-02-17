@@ -49,9 +49,11 @@ fun CommunityChatScreen(
     }
 
     Scaffold(
+        containerColor = Color(0xFFF5F5F5), // Cor de fundo geral do ecrã
         topBar = {
             TopAppBar(
                 title = { Text("Comunidade", fontWeight = FontWeight.Bold) },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFF5F5F5)),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
@@ -64,35 +66,47 @@ fun CommunityChatScreen(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .background(Color(0xFFF5F5F5))
+                .background(Color(0xFFF5F5F5)) // Garante fundo cinza atrás de tudo
         ) {
-            LazyColumn(
-                state = scrollState,
-                modifier = Modifier.weight(1f).padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(vertical = 16.dp)
+
+            // --- CAIXA BRANCA COM A LISTA DE MENSAGENS ---
+            Surface(
+                modifier = Modifier
+                    .weight(1f) // Ocupa todo o espaço disponível menos o input
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 8.dp), // Margem para ver o fundo cinza
+                color = Color.White, // Fundo branco pedido
+                shape = RoundedCornerShape(24.dp), // Arredondamento em cima e em baixo
+                shadowElevation = 2.dp // Pequena sombra para destacar (opcional)
             ) {
-                items(items = messages) { msg ->
-                    // --- ANIMAÇÃO DE ENTRADA ---
-                    AnimatedVisibility(
-                        visible = true,
-                        enter = fadeIn(animationSpec = tween(400)) +
-                                slideInVertically(initialOffsetY = { 50 }, animationSpec = tween(400)),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        val isMine = msg.senderId == currentUser?.uid
-                        ChatBubble(msg, isMine)
+                LazyColumn(
+                    state = scrollState,
+                    modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(vertical = 16.dp)
+                ) {
+                    items(items = messages) { msg ->
+                        // --- ANIMAÇÃO DE ENTRADA ---
+                        AnimatedVisibility(
+                            visible = true,
+                            enter = fadeIn(animationSpec = tween(400)) +
+                                    slideInVertically(initialOffsetY = { 50 }, animationSpec = tween(400)),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            val isMine = msg.senderId == currentUser?.uid
+                            ChatBubble(msg, isMine)
+                        }
                     }
                 }
             }
 
-            // --- INPUT DE MENSAGEM ARREDONDADO (MODERNO) ---
+            // --- INPUT DE MENSAGEM ARREDONDADO ---
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    //.padding(12.dp) // Espaço entre a cápsula e as bordas do telemóvel
-                    .navigationBarsPadding()
-                    .imePadding(),
+                    .navigationBarsPadding() // Protege contra a barra de navegação do Android
+                    .imePadding() // Sobe com o teclado
+                    .padding(bottom = 12.dp, start = 12.dp, end = 12.dp), // Espaçamento externo
                 tonalElevation = 8.dp,
                 shadowElevation = 4.dp,
                 shape = RoundedCornerShape(32.dp),
@@ -100,7 +114,7 @@ fun CommunityChatScreen(
             ) {
                 Row(
                     modifier = Modifier
-                        .padding(horizontal = 4.dp, vertical = 4.dp), // Padding interno da cápsula
+                        .padding(horizontal = 4.dp, vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TextField(
@@ -122,16 +136,10 @@ fun CommunityChatScreen(
                     IconButton(
                         onClick = {
                             if (messageText.isNotBlank()) {
-                                // LÓGICA DE NOME MELHORADA
-                                // Tenta o nome -> se não tiver, tenta a parte do email antes do @ -> se não, "Anónimo"
-                                /*val senderName = currentUser?.displayName?.takeIf { it.isNotBlank() }
-                                    ?: currentUser?.email?.substringBefore("@")
-                                    ?: "Anónimo"*/
-
                                 chatViewModel.sendMessage(
                                     messageText,
                                     currentUser?.uid ?: "",
-                                    realName // <--- Agora enviamos sempre um nome válido
+                                    realName
                                 )
                                 messageText = ""
                             }
@@ -165,10 +173,12 @@ fun ChatBubble(msg: ChatMessage, isMine: Boolean) {
         java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(date)
     }
 
-    // Cores de segurança caso não tenhas definido
+    // Cores
     val nameColor = Color(0xFF7C4DFF) // AccentPurple
+    // NOTA: Mudei a cor da TUA bolha para Roxo, e a dos OUTROS para Cinza claro
+    // para contrastar melhor com o fundo Branco da lista.
     val bubbleColorMine = Color(0xFF7C4DFF)
-    val bubbleColorOther = Color.White
+    val bubbleColorOther = Color(0xFFF0F0F0) // Cinza claro para os outros (melhor em fundo branco)
 
     Column(
         modifier = Modifier
@@ -177,14 +187,13 @@ fun ChatBubble(msg: ChatMessage, isMine: Boolean) {
         horizontalAlignment = if (isMine) Alignment.End else Alignment.Start
     ) {
         // --- NOME DO REMETENTE ---
-        // Se quiseres ver o TEU nome também, remove o "if (!isMine)"
         if (!isMine) {
             Text(
-                text = msg.senderName.ifBlank { "Desconhecido" }, // Fallback visual
-                fontSize = 12.sp, // Aumentei ligeiramente para ler melhor
+                text = msg.senderName.ifBlank { "Desconhecido" },
+                fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 color = nameColor,
-                modifier = Modifier.padding(start = 12.dp, bottom = 4.dp) // Ajustei padding para alinhar com a bolha
+                modifier = Modifier.padding(start = 12.dp, bottom = 4.dp)
             )
         }
 
@@ -193,7 +202,6 @@ fun ChatBubble(msg: ChatMessage, isMine: Boolean) {
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = if (isMine) Arrangement.End else Arrangement.Start
         ) {
-            // Hora à esquerda (se for minha mensagem)
             if (isMine) {
                 Text(
                     text = timeFormatted,
@@ -208,11 +216,10 @@ fun ChatBubble(msg: ChatMessage, isMine: Boolean) {
                 shape = RoundedCornerShape(
                     topStart = 18.dp,
                     topEnd = 18.dp,
-                    bottomStart = if (isMine) 18.dp else 4.dp, // Ponta da bolha ajustada
+                    bottomStart = if (isMine) 18.dp else 4.dp,
                     bottomEnd = if (isMine) 4.dp else 18.dp
                 ),
-                tonalElevation = 2.dp,
-                shadowElevation = 2.dp
+                tonalElevation = 1.dp,
             ) {
                 Text(
                     text = msg.text,
@@ -222,7 +229,6 @@ fun ChatBubble(msg: ChatMessage, isMine: Boolean) {
                 )
             }
 
-            // Hora à direita (se for mensagem de outro)
             if (!isMine) {
                 Text(
                     text = timeFormatted,

@@ -26,7 +26,7 @@ import com.ixsvf.almanaboca.viewmodel.SessionViewModel
 // import com.ixsvf.almanaboca.screens.menusubscreens.AdminBookingScreen
 
 sealed class Screen(val route: String) {
-    object Login : Screen("login")
+    object Login : Screen("login_screen")
     object Menu : Screen("menu")
 }
 

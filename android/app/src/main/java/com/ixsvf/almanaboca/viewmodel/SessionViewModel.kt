@@ -17,6 +17,7 @@ import com.ixsvf.almanaboca.ui.theme.states.LoginUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class SessionViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -78,15 +79,22 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
     // --- CORREÇÃO DO SIGNOUT ---
     fun signOut() {
         viewModelScope.launch {
-            // 1. Limpar o DataStore (Apaga os dados do telemóvel)
-            userPreferences.clearSession()
+            try {
+                // 1. Limpar o DataStore (Apaga as credenciais guardadas no telemóvel)
+                userPreferences.clearSession()
 
-            // 2. Fazer Logout do Firebase
-            auth.signOut()
+                // 2. Fazer Logout do Firebase
+                auth.signOut()
 
-            // 3. Resetar estados
-            _currentUser.value = null
-            _uiState.value = LoginUiState.Idle
+                // 3. Resetar TODOS os estados da memória
+                _currentUser.value = null
+                _userName.value = ""
+                _canAccessChat.value = false
+                _uiState.value = LoginUiState.Idle // Volta ao estado inicial
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
@@ -152,4 +160,74 @@ class SessionViewModel(application: Application) : AndroidViewModel(application)
                 _canAccessChat.value = false
             }
     }
+
+
+    fun verifyAccessNow(onSuccess: () -> Unit, onFailure: () -> Unit) {
+        val uid = auth.currentUser?.uid
+        if (uid == null) {
+            onFailure()
+            return
+        }
+
+        db.collection("users").document(uid).get()
+            .addOnSuccessListener { document ->
+                // Lê o valor diretamente do servidor
+                val hasAccess = document.getBoolean("hasChat") ?: false
+
+                // Atualiza o estado local também, já agora
+                _canAccessChat.value = hasAccess
+
+                if (hasAccess) {
+                    onSuccess()
+                } else {
+                    onFailure()
+                }
+            }
+            .addOnFailureListener {
+                onFailure()
+            }
+    }
+
+
+
+
+
+
+
+
+
+    fun deleteAccount(onSuccess: () -> Unit, onError: (String) -> Unit) {
+        val user = auth.currentUser
+        val uid = user?.uid ?: return
+
+        viewModelScope.launch {
+            try {
+                // 1. Apagar dados do Firestore (Usamos await() para esperar que acabe)
+                db.collection("users").document(uid).delete().await()
+
+                // 2. Apagar Utilizador do Auth (Também com await)
+                // Se o login for antigo, isto vai atirar uma exceção que o catch apanha
+                user.delete().await()
+
+                // 3. Limpar dados locais
+                // AGORA FUNCIONA: Porque estamos diretamente dentro do viewModelScope.launch
+                // e não dentro de um callback addOnSuccessListener
+                userPreferences.clearSession()
+
+                // 4. Resetar estados
+                _currentUser.value = null
+                _uiState.value = LoginUiState.Idle
+
+                onSuccess()
+
+            } catch (e: Exception) {
+                // O await() atira exceções automaticamente se algo falhar
+                // O erro mais comum é "FirebaseAuthRecentLoginRequiredException"
+                onError("Erro: ${e.message}. Tente sair e fazer login novamente.")
+            }
+        }
+    }
+
 }
+
+

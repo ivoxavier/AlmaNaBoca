@@ -29,5 +29,19 @@
     <string name="lbl_booking_request_made">Booking request sent. Await Confirmation.</string>
     <string name="lbl_booking_hour_error">Error: Hour already Occupied!</string>
     <string name="lbl_booking_error_on_approval">Error: Approval not made!</string>
+    <string name="lbl_rgpd_disclaimer">1. Data Collection\nWe collect your name, email, and navigation data to enhance your experience on the AlmanaBoca app.\n\n2. Data Usage\nYour data is used for account management, community access, and personalized notifications.\n\n3. Third-Party Sharing\nWe do not sell your data to third parties. We only share strictly necessary data with service providers (e.g., Google Firebase for authentication).\n\n4. Your Rights\nYou have the right to access, correct, or delete your account and data at any time via the app settings.\n\n5. Contact\nFor privacy inquiries, please contact: suporte@almanaboca.com.</string>
+    <string name="lbl_rgpd_label_1">By logging in, you confirm that you have read and accept our</string>
+    <string name="lbl_rgpd_label_2">Privacy Policy</string>
+    <string name="lbl_rgpd_label_3">and the processing of your data.</string>
+    <string name="lbl_recover_password">Recover Password</string>
+    <string name="lbl_recover_password_email">Enter your email address. We will send you a link to reset your password.</string>
+    <string name="lbl_email">Email</string>
+    <string name="lbl_send_email">Send Email</string>
+    <string name="lbl_type_email">Please, type your email</string>
+    <string name="lbl_check_your_email">Email sent! Check your inbox or in spam</string>
+    <string name="lbl_error">Error</string>
+    <string name="lbl_cancel">Cancel</string>
+    <string name="lbl_close">Close</string>
+    <string name="lbl_developed_by">Developed by</string>
 
 </resources>
