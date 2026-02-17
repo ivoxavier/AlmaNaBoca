@@ -16,7 +16,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.ixsvf.almanaboca.screens.LoginScreen
 import com.ixsvf.almanaboca.screens.MenuScreen
+import com.ixsvf.almanaboca.screens.menusubscreens.CommunityChatScreen
 import com.ixsvf.almanaboca.screens.menusubscreens.UserScreen
+import com.ixsvf.almanaboca.screens.menusubscreens.YouTubeScreen
 import com.ixsvf.almanaboca.ui.theme.AlmaNaBocaTheme
 import com.ixsvf.almanaboca.ui.theme.states.LoginUiState
 import com.ixsvf.almanaboca.viewmodel.SessionViewModel
@@ -90,11 +92,16 @@ fun AlmanaBocaNavigation(
         ) { backStackEntry ->
             val videoId = backStackEntry.arguments?.getString("videoId") ?: ""
             // Chama o ecrã que criámos no Passo 2
-            com.ixsvf.almanaboca.screens.menusubscreens.YouTubeScreen(videoId = videoId)
+            //com.ixsvf.almanaboca.screens.menusubscreens.YouTubeScreen(videoId = videoId)
+            YouTubeScreen(videoId = videoId)
         }
 
         composable("user_screen") {
             UserScreen(navController = navController, sessionViewModel = sessionViewModel)
+        }
+
+        composable("community_chat") {
+            CommunityChatScreen(navController = navController)
         }
     }
 }

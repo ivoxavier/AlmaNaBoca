@@ -115,7 +115,8 @@ fun BottomNavigationBar(navController: NavController) {
                 }
             },
             shape = CircleShape,
-            containerColor = BrandRed,
+            //containerColor = BrandRed,
+            containerColor = Color.White,
             contentColor = Color.White,
             elevation = FloatingActionButtonDefaults.elevation(8.dp),
             modifier = Modifier
@@ -126,7 +127,7 @@ fun BottomNavigationBar(navController: NavController) {
                 .border(BorderStroke(5.dp, Color.White), CircleShape)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.almanaboca),
+                painter = painterResource(id = R.drawable.almanaboca_white),
                 contentDescription = "Home",
                 modifier = Modifier.size(76.dp),
                 tint = Color.Unspecified

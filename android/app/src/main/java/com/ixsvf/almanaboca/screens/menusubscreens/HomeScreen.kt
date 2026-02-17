@@ -54,13 +54,13 @@ import java.time.format.DateTimeFormatter
 
 // --- Cores ---
 private val CardWhite = Color.White
-private val TextGray = Color(0xFF6B7280)
-private val TextDark = Color(0xFF1F2937)
+val TextGray = Color(0xFF6B7280)
+val TextDark = Color(0xFF1F2937)
 private val PromoYellowBg = Color(0xFFFFF9C4)
 private val PromoYellowText = Color(0xFFB7791F)
 private val SpotifyGreen = Color(0xFF1DB954)
 private val WhatsAppGreen = Color(0xFF25D366) // Cor do WhatsApp
-private val AccentPurple = Color(0xFF7C4DFF)
+val AccentPurple = Color(0xFF7C4DFF)
 
 // --- CONFIGURAÇÃO DE ADMINS ---
 private val ADMIN_EMAILS = listOf(AlmanaBocaConstants.ADMINS.MARTA, AlmanaBocaConstants.ADMINS.IVO)
@@ -113,7 +113,7 @@ fun HomeScreen(
                     ) {
                         // 1. O Logótipo (com o gatilho secreto de Admin)
                         // Usamos Alignment.Center para garantir que o logo fica no meio
-                        Box(
+                        /*Box(
                             modifier = Modifier
                                 .align(Alignment.Center)
                                 .combinedClickable(
@@ -128,7 +128,7 @@ fun HomeScreen(
                                 )
                         ) {
                             //AlmanaBocaLogo()
-                        }
+                        }*/
 
                         // 2. O Ícone de Menu (Três Pontinhos) no topo direito
                         IconButton(
@@ -171,11 +171,16 @@ fun HomeScreen(
                         PaddingBox { SummaryTopPageText(stringResource(R.string.lbl_meditations_circles)) }
                         PaddingBox {
                             if (meditationItem != null) {
-                                // PASSAMOS O NOME DO UTILIZADOR PARA O CARD
+
                                 MeditationCircleCard(item = meditationItem, userName = userName)
                             } else {
                                 Text(stringResource(R.string.lbl_meditations_next_meditations), color = TextGray)
                             }
+                        }
+
+                        PaddingBox { SummaryTopPageText(stringResource(R.string.lbl_comunities)) }
+                        PaddingBox {
+                            CommunityCard(onClick = { navController.navigate("community_chat") })
                         }
 
                         Spacer(modifier = Modifier.height(12.dp))
@@ -352,6 +357,48 @@ fun MeditationCircleCard(item: HomeItem, userName: String) {
         }
     }
 }
+
+
+
+
+// Adicione este card aos seus componentes UI no final do ficheiro
+@Composable
+fun CommunityCard(onClick: () -> Unit) {
+    Card(
+        onClick = onClick,
+        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier.fillMaxWidth().wrapContentHeight()
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(50.dp)
+                    .background(AccentPurple.copy(alpha = 0.1f), RoundedCornerShape(12.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Outlined.Groups, null, tint = AccentPurple, modifier = Modifier.size(30.dp))
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text("Comunidade AlmaNaBoca", fontWeight = FontWeight.Bold, color = TextDark)
+                Text("Espaço exclusivo de partilha e apoio.", fontSize = 12.sp, color = TextGray)
+            }
+
+            Icon(Icons.Default.Send, null, tint = AccentPurple.copy(alpha = 0.5f), modifier = Modifier.size(20.dp))
+        }
+    }
+}
+
+
+
+
 
 @Composable
 fun DetailRowSmall(icon: ImageVector, text: String) {
