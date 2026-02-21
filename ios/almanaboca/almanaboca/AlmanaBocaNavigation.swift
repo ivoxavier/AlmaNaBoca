@@ -3,6 +3,7 @@ import SwiftUI
 enum Screen: Hashable {
     case login
     case menu
+    case chat // Rota do chat garantida aqui
 }
 
 struct AlmanaBocaNavigation: View {
@@ -27,10 +28,13 @@ struct AlmanaBocaNavigation: View {
                     )
                     
                 case .menu:
-                    // Se estiveres a usar o MenuScreen que contém o HomeScreen:
-                    MenuScreen()
+                    // ⚠️ CORREÇÃO 1: Enviar o navigationPath para o MenuScreen
+                    MenuScreen(navigationPath: $navigationPath)
                         .navigationBarBackButtonHidden(true)
-                    // Se estiveres a testar o HomeScreen diretamente, usa: HomeScreen()
+                    
+                case .chat:
+                    // Destino do Chat
+                    CommunityChatScreen()
                 }
             }
             .onChange(of: sessionViewModel.currentUser) { newUser in
@@ -39,7 +43,8 @@ struct AlmanaBocaNavigation: View {
                 }
             }
         }
-        // ⚠️ CORREÇÃO CRÍTICA: Injetar o ViewModel no ambiente
+        // ⚠️ CORREÇÃO 2: Injetar o ViewModel no ambiente
         .environmentObject(sessionViewModel)
     }
+    // As chavetas agora estão todas nos sítios certos!
 }

@@ -11,6 +11,13 @@ struct HomeScreen: View {
     @StateObject private var viewModel = HomeViewModel()
     @EnvironmentObject var sessionViewModel: SessionViewModel
     
+    @State private var navigateToChat = false
+        
+        // 2. Controla o Alerta de Erro de Subscrição
+        @State private var showAccessDeniedAlert = false
+    
+    @State private var isCheckingChat = false
+    
     var body: some View {
         ZStack {
             // MUDANÇA: Fundo Branco
@@ -104,6 +111,29 @@ struct HomeScreen: View {
                             }
                         }
                         
+                        VStack(alignment: .leading, spacing: 16) {
+                                                    Text("Comunidade")
+                                                        .font(.headline).bold().foregroundColor(.textDark).padding(.horizontal)
+                                                    
+                                                    CommunityCard(isChecking: isCheckingChat) {
+                                                        guard !isCheckingChat else { return }
+                                                        isCheckingChat = true
+                                                        
+                                                        sessionViewModel.verifyAccessNow(
+                                                            onSuccess: {
+                                                                isCheckingChat = false
+                                                                // 2. ACIONAMOS A NAVEGAÇÃO AQUI
+                                                                navigateToChat = true
+                                                            },
+                                                            onFailure: {
+                                                                isCheckingChat = false
+                                                                showAccessDeniedAlert = true
+                                                            }
+                                                        )
+                                                    }
+                                                    .padding(.horizontal)
+                                                }
+                        
                         // --- SECÇÃO: SOBRE MIM ---
                         VStack(alignment: .leading, spacing: 16) {
                             Text("Sobre Mim")
@@ -151,6 +181,14 @@ struct HomeScreen: View {
                     .padding(.vertical)
                 }
             }
+        }
+// 4. Pop-up de alerta (Acesso Negado)
+        .alert(isPresented: $showAccessDeniedAlert) {
+            Alert(
+                title: Text("Acesso Negado"),
+                message: Text("A Comunidade AlmaNaBoca é um espaço exclusivo. Verifica a tua subscrição."),
+                dismissButton: .default(Text("OK"))
+            )
         }
     }
     
@@ -298,6 +336,48 @@ struct MeditationCircleCard: View {
     }
 }
 
+// MARK: - COMMUNITY CARD
+struct CommunityCard: View {
+    var isChecking: Bool
+    let onClick: () -> Void
+    
+    var body: some View {
+        HStack {
+            ZStack {
+                RoundedRectangle(cornerRadius: 12).fill(Color.accentPurple.opacity(0.1)).frame(width: 50, height: 50)
+                Image(systemName: "person.3").font(.system(size: 24)).foregroundColor(.accentPurple)
+            }
+            Spacer().frame(width: 16)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Comunidade AlmaNaBoca").font(.body).fontWeight(.bold).foregroundColor(.textDark).multilineTextAlignment(.leading)
+                Text("Espaço exclusivo de partilha e apoio.").font(.caption).foregroundColor(.textGray).multilineTextAlignment(.leading)
+            }
+            Spacer()
+            if isChecking {
+                ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .accentPurple)).scaleEffect(1.2)
+            } else {
+                Image(systemName: "paperplane.fill").foregroundColor(.accentPurple.opacity(0.5))
+            }
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 4)
+        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.gray.opacity(0.1), lineWidth: 1))
+        .onTapGesture {
+            let impactMed = UIImpactFeedbackGenerator(style: .medium)
+            impactMed.impactOccurred()
+            onClick()
+        }
+    }
+}
+
+
+
+
+
+
+
 struct DetailRowSmall: View {
     let icon: String
     let text: String
@@ -390,7 +470,6 @@ extension Color {
 // ISTO PREVINE O CRASH NO PREVIEW DO XCODE
 struct HomeScreen_Previews: PreviewProvider {
     static var previews: some View {
-        HomeScreen()
-            .environmentObject(SessionViewModel()) // <--- AQUI ESTÁ A CORREÇÃO PARA O PREVIEW
+        HomeScreen().environmentObject(SessionViewModel())
     }
 }

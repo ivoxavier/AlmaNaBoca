@@ -1,8 +1,11 @@
 import SwiftUI
 import FirebaseAuth
+import FirebaseFirestore
 
 @MainActor
 class SessionViewModel: ObservableObject {
+    
+    private let db = Firestore.firestore()
     
     @Published var uiState: LoginUiState = .idle
     @Published var currentUser: UserProfile? = nil
@@ -61,4 +64,35 @@ class SessionViewModel: ObservableObject {
         self.currentUser = nil
         self.uiState = .idle
     }
-}
+    
+    func verifyAccessNow(onSuccess: @escaping () -> Void, onFailure: @escaping () -> Void) {
+            guard let uid = Auth.auth().currentUser?.uid else {
+                DispatchQueue.main.async { onFailure() }
+                return
+            }
+            
+            // Pede os dados ao Firestore
+            db.collection("users").document(uid).getDocument { document, error in
+                // Tudo o que mexe na UI tem de voltar à Main Thread
+                DispatchQueue.main.async {
+                    if let error = error {
+                        print("Erro do Firebase ao ler acesso: \(error.localizedDescription)")
+                        onFailure()
+                        return
+                    }
+                    
+                    if let document = document, document.exists {
+                        let hasAccess = document.data()?["hasChat"] as? Bool ?? false
+                        
+                        if hasAccess {
+                            onSuccess()
+                        } else {
+                            onFailure()
+                        }
+                    } else {
+                        // Documento do user não existe na BD
+                        onFailure()
+                    }
+                }
+            }
+        }}

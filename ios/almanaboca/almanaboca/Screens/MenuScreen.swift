@@ -34,6 +34,9 @@ struct MenuScreen: View {
     // A App vai iniciar com o .home selecionado (que agora estará no meio)
     @State private var selectedTab: TabItem = .home
     
+    // 1. Recebe o path do AlmanaBocaNavigation
+        @Binding var navigationPath: NavigationPath
+    
     var body: some View {
         TabView(selection: $selectedTab) {
             
@@ -45,7 +48,9 @@ struct MenuScreen: View {
                 .tag(TabItem.meditations)
             
             // --- POSIÇÃO 2 (MEIO): Home ---
-            HomeScreen()
+            HomeScreen(
+                
+            )
                 .tabItem {
                     Label(TabItem.home.title, systemImage: TabItem.home.iconName)
                 }
@@ -75,7 +80,7 @@ struct MenuScreen: View {
 // MARK: - Previews
 struct MenuScreen_Previews: PreviewProvider {
     static var previews: some View {
-        MenuScreen()
+        MenuScreen(navigationPath: .constant(NavigationPath()))
             .environmentObject(SessionViewModel()) // Exemplo de injeção para preview
     }
 }
