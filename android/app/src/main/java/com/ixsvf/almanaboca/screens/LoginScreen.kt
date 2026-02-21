@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -135,12 +138,7 @@ fun LoginScreen(
                             contentScale = ContentScale.Fit
                         )
 
-                        Text(
-                            text = stringResource(R.string.lbl_developed_by) + " Ivo Xavier<ixsvf>",
-                            color = Color.LightGray,
-                            fontSize = 12.sp,
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
+
 
                         // TIP: SIGAM ATOMIC DESIGN SEMPRE QUE POSSIVEL
                         // POR MAIS ESTUPIDO QUE POSSA PARECER
@@ -176,21 +174,22 @@ fun LoginScreen(
                                     //Spacer(modifier = Modifier.height(32.dp))
                                     BlankSpace(32)
 
-                                    OutlinedTextComponent(
+                                    LoginInputText(
                                         value = email,
                                         onValueChange = { email = it },
                                         label = stringResource(R.string.lbl_account),
-                                        singleLine = true
+                                        icon = Icons.Outlined.Email // Ícone de carta/email
                                     )
 
                                     //Spacer(modifier = Modifier.height(16.dp))
                                     BlankSpace(16)
 
-                                    OutlinedTextComponent(
+                                    LoginInputText(
                                         value = password,
                                         onValueChange = { password = it },
                                         label = stringResource(R.string.lbl_password),
-                                        singleLine = true
+                                        icon = Icons.Outlined.Lock, // Ícone de cadeado
+                                        isPassword = true // <-- Muito importante para esconder o texto e mostrar o olhinho
                                     )
 
                                     if (uiState is LoginUiState.Error) {
@@ -258,6 +257,13 @@ fun LoginScreen(
 
                         Text(
                             text = appVersion,
+                            color = Color.LightGray,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+
+                        Text(
+                            text = stringResource(R.string.lbl_developed_by) + " Ivo Xavier <ixsvf>",
                             color = Color.LightGray,
                             fontSize = 12.sp,
                             modifier = Modifier.padding(bottom = 16.dp)
