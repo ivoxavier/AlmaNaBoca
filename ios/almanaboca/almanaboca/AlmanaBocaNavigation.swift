@@ -3,11 +3,11 @@ import SwiftUI
 enum Screen: Hashable {
     case login
     case menu
-    case chat // Rota do chat garantida aqui
+    case chat
+    case userProfile // <--- NOVO DESTINO
 }
 
 struct AlmanaBocaNavigation: View {
-    // Aqui criamos o ViewModel principal
     @StateObject private var sessionViewModel = SessionViewModel()
     @State private var navigationPath = NavigationPath()
 
@@ -22,29 +22,32 @@ struct AlmanaBocaNavigation: View {
             .navigationDestination(for: Screen.self) { screen in
                 switch screen {
                 case .login:
-                    LoginScreen(
-                        uiState: sessionViewModel.uiState,
-                        onLoginClick: { _,_ in }
-                    )
+                    LoginScreen(uiState: sessionViewModel.uiState, onLoginClick: { _,_ in })
                     
                 case .menu:
-                    // ⚠️ CORREÇÃO 1: Enviar o navigationPath para o MenuScreen
-                    MenuScreen(navigationPath: $navigationPath)
-                        .navigationBarBackButtonHidden(true)
+                    MenuScreen(
+                        onNavigateToChat: { navigationPath.append(Screen.chat) },
+                        onNavigateToProfile: { navigationPath.append(Screen.userProfile) } // <--- NAVEGAÇÃO PERFIL
+                    )
+                    .navigationBarBackButtonHidden(true)
                     
                 case .chat:
-                    // Destino do Chat
                     CommunityChatScreen()
+                    
+                case .userProfile:
+                    UserScreen() // <--- O NOVO ECRÃ
                 }
             }
+            // Navega para o Menu quando o login é feito com sucesso
             .onChange(of: sessionViewModel.currentUser) { newUser in
                 if newUser != nil {
                     navigationPath.append(Screen.menu)
+                } else {
+                    // SE FIZER LOGOUT OU APAGAR CONTA: Limpa tudo e volta ao Login
+                    navigationPath.removeLast(navigationPath.count)
                 }
             }
         }
-        // ⚠️ CORREÇÃO 2: Injetar o ViewModel no ambiente
         .environmentObject(sessionViewModel)
     }
-    // As chavetas agora estão todas nos sítios certos!
 }

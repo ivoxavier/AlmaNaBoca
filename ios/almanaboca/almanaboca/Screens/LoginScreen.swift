@@ -5,9 +5,6 @@
 
 import SwiftUI
 
-// Definição da cor da marca
-
-
 struct LoginScreen: View {
     // Parâmetros recebidos
     var uiState: LoginUiState
@@ -18,6 +15,7 @@ struct LoginScreen: View {
     @State private var password = ""
     @State private var isSplashFinished = false
     @State private var showFormAnimation = false
+    @State private var showPassword = false
     
     // VARIÁVEIS PARA O ALERTA DE ERRO
     @State private var showErrorAlert = false
@@ -37,20 +35,18 @@ struct LoginScreen: View {
 
     var body: some View {
         ZStack {
-            // 1. FUNDO SÓLIDO
-            Color.brandRed
+            // 1. MUDANÇA AQUI: Fundo Branco Puro
+            Color.white
                 .ignoresSafeArea()
-            
-            // Texto global branco
-            .foregroundColor(.white)
 
             if !isSplashFinished {
                 // --- FASE 1: SPLASH ---
                 VStack {
-                    Image("AppLogo")
+                    // ATENÇÃO: Usa o nome do teu LOGO PRETO aqui
+                    Image("almanaboca_white")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(width: 300, height: 300)
+                        .frame(width: 250)
                         .padding(32)
                 }
                 .transition(.opacity)
@@ -58,50 +54,56 @@ struct LoginScreen: View {
                 // --- FASE 2: LOGIN ---
                 VStack(spacing: 0) {
                     
-                    Spacer()
+                    Spacer().frame(height: 30)
                     
-                    // Logo
-                    Image("AppLogo")
+                    // Logo de Topo
+                    Image("almanaboca_white") // ATENÇÃO: Usa o nome do teu LOGO PRETO aqui
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(height: 180)
-                        .padding(.bottom, 10)
+                        .frame(height: 120)
+                        .padding(.bottom, 20)
                     
-                  
-                    
-                    // --- ÁREA DO FORMULÁRIO ---
+                    // --- ÁREA DO CARTÃO (CARD) ---
                     if showFormAnimation {
-                        VStack(spacing: 20) {
+                        VStack(spacing: 24) {
                             
-                            Spacer().frame(height: 20)
+                            // Título do Cartão
+                            Text("Login into Your Account")
+                                .font(.system(size: 16, weight: .medium, design: .rounded))
+                                .foregroundColor(.gray)
+                                .padding(.top, 10)
                             
-                            // Campo Email
-                            ModernTextField(
-                                text: $email,
-                                placeholder: "Email",
-                                iconName: "envelope.fill",
-                                isSecure: false
-                            )
-                            .focused($focusedField, equals: .email)
-                            .submitLabel(.next)
-                            .onSubmit { focusedField = .password }
-                            
-                            // Campo Password
-                            ModernTextField(
-                                text: $password,
-                                placeholder: "Password",
-                                iconName: "lock.fill",
-                                isSecure: true
-                            )
-                            .focused($focusedField, equals: .password)
-                            .submitLabel(.go)
-                            .onSubmit {
-                                if !isLoading { onLoginClick(email, password) }
+                            // Campos de Texto
+                            VStack(spacing: 16) {
+                                // Campo Account (Email)
+                                AndroidStyleTextField(
+                                    text: $email,
+                                    placeholder: "Account",
+                                    iconName: "envelope",
+                                    isSecure: false
+                                )
+                                .focused($focusedField, equals: .email)
+                                .submitLabel(.next)
+                                .onSubmit { focusedField = .password }
+                                
+                                // Campo Password
+                                AndroidStyleTextField(
+                                    text: $password,
+                                    placeholder: "Password",
+                                    iconName: "lock",
+                                    isSecure: true,
+                                    showPassword: $showPassword
+                                )
+                                .focused($focusedField, equals: .password)
+                                .submitLabel(.go)
+                                .onSubmit {
+                                    if !isLoading && !email.isEmpty && !password.isEmpty {
+                                        onLoginClick(email, password)
+                                    }
+                                }
                             }
                             
-                            Spacer().frame(height: 10)
-                            
-                            // Botão Entrar
+                            // Botão Login (Pequeno e arredondado como no Android)
                             Button(action: {
                                 if !isLoading {
                                     focusedField = nil
@@ -110,46 +112,69 @@ struct LoginScreen: View {
                             }) {
                                 ZStack {
                                     if isLoading {
-                                        ProgressView()
-                                            .tint(.brandRed)
+                                        ProgressView().tint(Color.white)
                                     } else {
-                                        Text("Login")
-                                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                                        Text("LOGIN")
+                                            .font(.system(size: 14, weight: .bold))
                                             .tracking(1)
                                     }
                                 }
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 56)
-                                .background(Color.white)
-                                .foregroundColor(.brandRed)
+                                .frame(width: 140, height: 45)
+                                // Fica cinza se os campos estiverem vazios, vermelho se estiver preenchido
+                                .background((email.isEmpty || password.isEmpty) ? Color.gray.opacity(0.3) : Color.brandRed)
+                                .foregroundColor((email.isEmpty || password.isEmpty) ? .gray : .white)
                                 .clipShape(Capsule())
-                                .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 5)
                             }
-                            .disabled(isLoading)
-                            .opacity(isLoading ? 0.8 : 1.0)
+                            .disabled(isLoading || email.isEmpty || password.isEmpty)
+                            .padding(.top, 8)
                             
-                            // Link Esqueci Password
+                            // Texto Legal de Política de Privacidade
+                            Text("By logging in, you confirm that you have read and\naccept our ")
+                                .font(.system(size: 12))
+                                .foregroundColor(.gray)
+                            + Text("Privacy Policy")
+                                .font(.system(size: 12))
+                                .foregroundColor(.brandRed)
+                            + Text(" and the processing of\nyour data.")
+                                .font(.system(size: 12))
+                                .foregroundColor(.gray)
+                                
+                        }
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 24)
+                        .padding(.bottom, 32)
+                        // ESTILO DO CARTÃO BRANCO (Sombra e Bordas)
+                        .background(Color.white)
+                        .cornerRadius(24)
+                        .shadow(color: Color.black.opacity(0.06), radius: 15, x: 0, y: 8)
+                        .padding(.horizontal, 24)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        
+                        Spacer()
+                        
+                        // --- RODAPÉ ---
+                        VStack(spacing: 20) {
                             Button(action: {
-                                // Ação de recuperar password
+                                // Ação Lost Password
                             }) {
-                                Text("Esqueci-me da palavra-passe")
+                                Text("Lost Password")
                                     .font(.system(size: 14, weight: .medium, design: .rounded))
                                     .underline()
-                                    .foregroundColor(.white.opacity(0.8))
+                                    .foregroundColor(.gray)
                             }
-                            .padding(.top, 10)
+                            
+                            Text("v1.0\n\nDeveloped by Ivo Xavier <ixsvf>")
+                                .font(.system(size: 12))
+                                .foregroundColor(.gray.opacity(0.5))
+                                .multilineTextAlignment(.center)
                         }
-                        .padding(.horizontal, 30)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        .padding(.bottom, 30)
                     }
-                    
-                    Spacer()
                 }
-                .padding(.top, 20)
                 .ignoresSafeArea(.keyboard, edges: .bottom)
             }
         }
-        // --- ANIMAÇÕES DE ENTRADA ---
+        // --- ANIMAÇÕES ---
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                 withAnimation(.easeInOut(duration: 0.6)) {
@@ -160,7 +185,7 @@ struct LoginScreen: View {
                 }
             }
         }
-        // --- LÓGICA DO ALERTA DE ERRO ---
+        // --- ALERTAS ---
         .onChange(of: uiState) { newState in
             if case .error(let message) = newState {
                 self.errorMessage = message
@@ -175,47 +200,62 @@ struct LoginScreen: View {
     }
 }
 
-// MARK: - Componentes Modernos
+// MARK: - Componente de Input ao estilo Android
 
-struct ModernTextField: View {
+struct AndroidStyleTextField: View {
     @Binding var text: String
     var placeholder: String
     var iconName: String
     var isSecure: Bool
+    var showPassword: Binding<Bool>? = nil
     
     var body: some View {
         HStack(spacing: 15) {
+            // Ícone da Esquerda
             Image(systemName: iconName)
-                .foregroundColor(.white.opacity(0.8))
+                .foregroundColor(.gray.opacity(0.7))
                 .frame(width: 20)
             
+            // Campo de Texto
             ZStack(alignment: .leading) {
                 if text.isEmpty {
                     Text(placeholder)
-                        .foregroundColor(.white.opacity(0.6))
+                        .foregroundColor(.gray.opacity(0.7))
                         .font(.system(size: 16, design: .rounded))
                 }
                 
-                if isSecure {
+                if isSecure && !(showPassword?.wrappedValue ?? false) {
                     SecureField("", text: $text)
-                        .foregroundColor(.white)
-                        .accentColor(.white)
+                        .foregroundColor(.black)
+                        .accentColor(Color.brandRed)
                 } else {
                     TextField("", text: $text)
-                        .foregroundColor(.white)
-                        .accentColor(.white)
+                        .foregroundColor(.black)
+                        .accentColor(Color.brandRed)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled(true)
-                        .keyboardType(placeholder == "Email" ? .emailAddress : .default)
+                        .keyboardType(placeholder == "Account" ? .emailAddress : .default)
+                }
+            }
+            
+            // Ícone de Mostrar/Esconder Password
+            if isSecure {
+                Button(action: {
+                    showPassword?.wrappedValue.toggle()
+                }) {
+                    Image(systemName: (showPassword?.wrappedValue ?? false) ? "eye.slash" : "eye")
+                        .foregroundColor(.gray.opacity(0.7))
                 }
             }
         }
         .padding()
-        .background(Color.white.opacity(0.2))
+        .background(Color.white)
         .cornerRadius(16)
+        // Sombra leve para destacar o input (tal como no Android)
+        .shadow(color: Color.black.opacity(0.04), radius: 5, x: 0, y: 3)
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                .stroke(Color.gray.opacity(0.15), lineWidth: 1)
         )
     }
 }

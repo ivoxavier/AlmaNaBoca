@@ -72,6 +72,10 @@ struct CommunityChatScreen: View {
             }
         }
         .navigationTitle("Comunidade")
+        navigationBarTitleDisplayMode(.inline)
+                // 👇 CORREÇÃO AQUI: Forçar a barra de navegação a ser opaca (Sólida)
+                .toolbarBackground(.visible, for: .navigationBar)
+                .toolbarBackground(Color(UIColor.systemGray6), for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
     }
 }

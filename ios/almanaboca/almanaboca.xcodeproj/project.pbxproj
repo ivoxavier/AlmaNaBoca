@@ -10,6 +10,7 @@
 		787BF4B02F3BECBB007F3DFB /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 787BF4AF2F3BECBB007F3DFB /* FirebaseCore */; };
 		787BF4B22F3BED6C007F3DFB /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 787BF4B12F3BED6C007F3DFB /* FirebaseAuth */; };
 		787BF4B72F42691E007F3DFB /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 787BF4B62F42691E007F3DFB /* FirebaseFirestore */; };
+		787BF55A2F4B1BAA007F3DFB /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 787BF5592F4B1BAA007F3DFB /* FirebaseMessaging */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,9 +36,22 @@
 		78952BD42F14145200BB8208 /* almanabocaUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = almanabocaUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		787BF5562F4B1681007F3DFB /* Exceptions for "almanaboca" folder in "almanaboca" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 78952BB92F14144F00BB8208 /* almanaboca */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		78952BBC2F14144F00BB8208 /* almanaboca */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				787BF5562F4B1681007F3DFB /* Exceptions for "almanaboca" folder in "almanaboca" target */,
+			);
 			path = almanaboca;
 			sourceTree = "<group>";
 		};
@@ -58,6 +72,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				787BF55A2F4B1BAA007F3DFB /* FirebaseMessaging in Frameworks */,
 				787BF4B02F3BECBB007F3DFB /* FirebaseCore in Frameworks */,
 				787BF4B22F3BED6C007F3DFB /* FirebaseAuth in Frameworks */,
 				787BF4B72F42691E007F3DFB /* FirebaseFirestore in Frameworks */,
@@ -132,6 +147,7 @@
 				787BF4AF2F3BECBB007F3DFB /* FirebaseCore */,
 				787BF4B12F3BED6C007F3DFB /* FirebaseAuth */,
 				787BF4B62F42691E007F3DFB /* FirebaseFirestore */,
+				787BF5592F4B1BAA007F3DFB /* FirebaseMessaging */,
 			);
 			productName = almanaboca;
 			productReference = 78952BBA2F14144F00BB8208 /* almanaboca.app */;
@@ -425,6 +441,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"almanaboca/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = almanaboca/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -454,6 +471,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"almanaboca/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = almanaboca/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -608,6 +626,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 787BF4AD2F3BEB1B007F3DFB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestore;
+		};
+		787BF5592F4B1BAA007F3DFB /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 787BF4AD2F3BEB1B007F3DFB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -12,6 +12,9 @@ struct HomeScreen: View {
     @EnvironmentObject var sessionViewModel: SessionViewModel
     
     @State private var navigateToChat = false
+    
+    var onNavigateToChat: () -> Void
+    var onNavigateToProfile: () -> Void
         
         // 2. Controla o Alerta de Erro de Subscrição
         @State private var showAccessDeniedAlert = false
@@ -53,7 +56,7 @@ struct HomeScreen: View {
                             
                             // Botão Perfil (Menu)
                             Button(action: {
-                                // Navegar para Perfil
+                                onNavigateToProfile()
                             }) {
                                 Image(systemName: "person.circle")
                                     .font(.system(size: 28))
@@ -127,9 +130,11 @@ struct HomeScreen: View {
                                                         sessionViewModel.verifyAccessNow(
                                                             onSuccess: {
                                                                 print("🟢 FIREBASE: Sucesso! Tem acesso.")
+                                                               
                                                                 isCheckingChat = false
+                                                                onNavigateToChat()
                                                                 // 2. ACIONAMOS A NAVEGAÇÃO AQUI
-                                                                navigateToChat = true
+                                                                //navigateToChat = true
                                                             },
                                                             onFailure: {
                                                                 print("🔴 FIREBASE: Falha! Acesso negado ou erro de rede.")
@@ -477,6 +482,10 @@ extension Color {
 // ISTO PREVINE O CRASH NO PREVIEW DO XCODE
 struct HomeScreen_Previews: PreviewProvider {
     static var previews: some View {
-        HomeScreen().environmentObject(SessionViewModel())
+        HomeScreen(
+            onNavigateToChat: {},
+            onNavigateToProfile: {}
+        )
+        .environmentObject(SessionViewModel())
     }
 }
