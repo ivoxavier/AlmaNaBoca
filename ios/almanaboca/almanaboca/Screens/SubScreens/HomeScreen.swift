@@ -116,16 +116,23 @@ struct HomeScreen: View {
                                                         .font(.headline).bold().foregroundColor(.textDark).padding(.horizontal)
                                                     
                                                     CommunityCard(isChecking: isCheckingChat) {
-                                                        guard !isCheckingChat else { return }
+                                                        print("🟢 COMMUNITY CARD: Clicado!")
+                                                        guard !isCheckingChat else {
+                                                            print("🟡 COMMUNITY CARD: Ignorado (já está a carregar)")
+                                                            return
+                                                        }
                                                         isCheckingChat = true
+                                                        print("🟢 COMMUNITY CARD: isCheckingChat = true (Spinner deve aparecer)")
                                                         
                                                         sessionViewModel.verifyAccessNow(
                                                             onSuccess: {
+                                                                print("🟢 FIREBASE: Sucesso! Tem acesso.")
                                                                 isCheckingChat = false
                                                                 // 2. ACIONAMOS A NAVEGAÇÃO AQUI
                                                                 navigateToChat = true
                                                             },
                                                             onFailure: {
+                                                                print("🔴 FIREBASE: Falha! Acesso negado ou erro de rede.")
                                                                 isCheckingChat = false
                                                                 showAccessDeniedAlert = true
                                                             }

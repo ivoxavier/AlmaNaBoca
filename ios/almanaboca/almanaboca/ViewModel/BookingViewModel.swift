@@ -13,7 +13,6 @@ class BookingViewModel: ObservableObject {
     @Published var alertMessage: String = ""
     @Published var showAlert: Bool = false
     
-    // CORREÇÃO: Usar o ficheiro Constants
     var isAdmin: Bool {
         let email = Auth.auth().currentUser?.email ?? ""
         return AlmanabocaConstants.adminEmails.contains(email)
@@ -41,8 +40,10 @@ class BookingViewModel: ObservableObject {
                     
                     let all = snapshot.documents.compactMap { try? $0.data(as: Booking.self) }
                     
-                    // Ordena por data (recente primeiro)
-                    self.bookings = all.sorted { $0.date > $1.date }
+                    // Ordena por data (recente primeiro) e filtra as antigas
+                    self.bookings = all
+                        .filter { self.isDateFutureOrToday($0.date) }
+                        .sorted { $0.date > $1.date }
                 }
             } catch {
                 print("Erro: \(error)")
@@ -87,7 +88,8 @@ class BookingViewModel: ObservableObject {
             clientName: name,
             clientEmail: userEmail,
             clientPhone: phone,
-            status: "pending"
+            status: "pending",
+            timestamp: Int64(Date().timeIntervalSince1970 * 1000) // Timestamp adicionado
         )
         
         Task {
@@ -107,16 +109,42 @@ class BookingViewModel: ObservableObject {
     func cancelBooking(_ booking: Booking) {
         guard let id = booking.id else { return }
         Task {
-            try? await db.collection("bookings").document(id).delete()
-            loadData()
+            do {
+                try await db.collection("bookings").document(id).delete()
+                self.loadData()
+            } catch {
+                print("Erro ao cancelar: \(error)")
+            }
         }
     }
     
+    // CORREÇÃO DO ERRO DO SWIFT 6 AQUI:
+    // Retiramos a inicialização direta do dicionário dentro do updateData para evitar o aviso "non-sendable type"
     func updateBookingStatus(_ booking: Booking, newStatus: String) {
         guard let id = booking.id else { return }
+        
+        // Criamos as variáveis fora do Task para serem seguras para concorrência
+        let docRef = db.collection("bookings").document(id)
+        let updateDict: [String: Any] = ["status": newStatus]
+        
         Task {
-            try? await db.collection("bookings").document(id).updateData(["status": newStatus])
-            loadData()
+            do {
+                try await docRef.updateData(updateDict)
+                self.loadData()
+            } catch {
+                print("Erro ao atualizar: \(error)")
+            }
         }
+    }
+    
+    // --- FUNÇÃO AUXILIAR DE DATA ---
+    private func isDateFutureOrToday(_ dateString: String) -> Bool {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yyyy"
+        
+        guard let date = formatter.date(from: dateString) else { return true }
+        
+        let result = Calendar.current.compare(date, to: Date(), toGranularity: .day)
+        return result == .orderedSame || result == .orderedDescending
     }
 }
