@@ -5,12 +5,12 @@ struct CommunityChatScreen: View {
     @EnvironmentObject var sessionViewModel: SessionViewModel
     @State private var messageText = ""
     
-    // Auto-scroll
-    @Namespace var bottomID
+    // CORREÇÃO: Usamos apenas uma String normal em vez de @Namespace
+    private let bottomID = "BOTTOM_SCROLL_ID"
     
     var body: some View {
         ZStack {
-            // Fundo Cinza Claro (igual ao Android)
+            // Fundo Cinza Claro da App
             Color(UIColor.systemGray6).ignoresSafeArea()
             
             VStack(spacing: 0) {
@@ -35,8 +35,10 @@ struct CommunityChatScreen: View {
                         }
                     }
                     .onAppear {
-                        // Scroll inicial para o fundo sem animação
-                        proxy.scrollTo(bottomID, anchor: .bottom)
+                        // Pequeno atraso para garantir que a lista carregou antes de fazer scroll
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            proxy.scrollTo(bottomID, anchor: .bottom)
+                        }
                     }
                 }
                 
@@ -72,11 +74,17 @@ struct CommunityChatScreen: View {
             }
         }
         .navigationTitle("Comunidade")
-        navigationBarTitleDisplayMode(.inline)
-                // 👇 CORREÇÃO AQUI: Forçar a barra de navegação a ser opaca (Sólida)
-                .toolbarBackground(.visible, for: .navigationBar)
-                .toolbarBackground(Color(UIColor.systemGray6), for: .navigationBar)
         .navigationBarTitleDisplayMode(.inline)
+        // Forçar a barra de navegação a ser opaca (Sólida)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarBackground(Color(UIColor.systemGray6), for: .navigationBar)
+        .onAppear {
+            let appearance = UINavigationBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = UIColor.systemGray6
+            UINavigationBar.appearance().standardAppearance = appearance
+            UINavigationBar.appearance().scrollEdgeAppearance = appearance
+        }
     }
 }
 
