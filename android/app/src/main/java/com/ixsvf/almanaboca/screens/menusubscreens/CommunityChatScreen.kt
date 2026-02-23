@@ -74,7 +74,7 @@ fun CommunityChatScreen(
                 modifier = Modifier
                     .weight(1f) // Ocupa todo o espaço disponível menos o input
                     .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 8.dp), // Margem para ver o fundo cinza
+                    .padding(horizontal = 12.dp, vertical = 1.dp), // Margem para ver o fundo cinza
                 color = Color.White, // Fundo branco pedido
                 shape = RoundedCornerShape(24.dp), // Arredondamento em cima e em baixo
                 shadowElevation = 2.dp // Pequena sombra para destacar (opcional)
@@ -106,10 +106,10 @@ fun CommunityChatScreen(
                     .fillMaxWidth()
                     .navigationBarsPadding() // Protege contra a barra de navegação do Android
                     .imePadding() // Sobe com o teclado
-                    .padding(bottom = 12.dp, start = 12.dp, end = 12.dp), // Espaçamento externo
+                    .padding(bottom = 12.dp, start = 10.dp, end = 12.dp), // Espaçamento externo
                 tonalElevation = 8.dp,
                 shadowElevation = 4.dp,
-                shape = RoundedCornerShape(32.dp),
+                shape = RoundedCornerShape(24.dp),
                 color = Color.White
             ) {
                 Row(
