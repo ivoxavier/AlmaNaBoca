@@ -43,5 +43,7 @@
     <string name="lbl_cancel">Cancel</string>
     <string name="lbl_close">Close</string>
     <string name="lbl_developed_by">Developed by</string>
+    <string name="lbl_marta_banner">Hi I am Marta</string>
+    <string name="lbl_marta_banner_mission">My mission is to help you find your voice and your balance...</string>
 
 </resources>

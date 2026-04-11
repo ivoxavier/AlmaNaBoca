@@ -210,9 +210,9 @@ fun HomeScreen(
                                 MartaBanner(size = 110.dp)
                                 Spacer(modifier = Modifier.width(16.dp))
                                 Column(modifier = Modifier.weight(1f)) {
-                                    Text("Olá, eu sou a Marta!", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = TextDark)
+                                    Text(stringResource(R.string.lbl_marta_banner), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = TextDark)
                                     Spacer(modifier = Modifier.height(4.dp))
-                                    Text("A minha missão é ajudar-te a encontrar a tua voz e o teu equilíbrio...", style = MaterialTheme.typography.bodySmall, color = TextGray, lineHeight = 18.sp, maxLines = 5, overflow = TextOverflow.Ellipsis)
+                                    Text(stringResource(R.string.lbl_marta_banner_mission), style = MaterialTheme.typography.bodySmall, color = TextGray, lineHeight = 18.sp, maxLines = 5, overflow = TextOverflow.Ellipsis)
                                 }
                             }
                         }
