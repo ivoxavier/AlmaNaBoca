@@ -17,6 +17,7 @@ import androidx.navigation.navArgument
 import com.ixsvf.almanaboca.screens.LoginScreen
 import com.ixsvf.almanaboca.screens.MenuScreen
 import com.ixsvf.almanaboca.screens.menusubscreens.CommunityChatScreen
+import com.ixsvf.almanaboca.screens.menusubscreens.ProgramDetailScreen
 import com.ixsvf.almanaboca.screens.menusubscreens.UserScreen
 import com.ixsvf.almanaboca.screens.menusubscreens.YouTubeScreen
 import com.ixsvf.almanaboca.ui.theme.AlmaNaBocaTheme
@@ -85,6 +86,18 @@ fun AlmanaBocaNavigation(
             // CORREÇÃO: Passamos o navController com o nome 'rootNavController'
             MenuScreen(rootNavController = navController)
         }
+
+
+        composable(
+            route = "program_details/{programName}",
+            arguments = listOf(navArgument("programName") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val programName = backStackEntry.arguments?.getString("programName") ?: ""
+            // Aqui chamas o novo ecrã de detalhes
+            ProgramDetailScreen(programName = programName, navController = navController)
+        }
+
+
 
         composable(
             route = "player/{videoId}",

@@ -5,6 +5,7 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -161,7 +162,10 @@ fun HomeScreen(
                                 contentPadding = PaddingValues(horizontal = 16.dp),
                                 horizontalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
-                                items(coachingItems) { item -> ProgramCarouselCard(item) }
+                                items(coachingItems) { item -> ProgramCarouselCard(item,
+                                    onClick = {
+                                    navController.navigate("program_details/${item.coachProgram}")
+                                }) }
                             }
                         } else {
                             PaddingBox { Text(stringResource(R.string.lbl_coach_programs_not_available), color = TextGray) }
@@ -238,12 +242,15 @@ fun HomeScreen(
 // --- COMPONENTES UI ---
 
 @Composable
-fun ProgramCarouselCard(item: HomeItem) {
+fun ProgramCarouselCard(item: HomeItem, onClick: () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(containerColor = CardWhite),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.width(300.dp).wrapContentHeight()
+        modifier = Modifier
+            .width(300.dp)
+            .wrapContentHeight()
+            .clickable { onClick() }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(item.coachProgram.ifEmpty { "Programa" }, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = TextDark, maxLines = 2)
