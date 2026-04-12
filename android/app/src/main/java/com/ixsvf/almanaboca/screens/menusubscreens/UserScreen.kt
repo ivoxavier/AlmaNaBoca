@@ -15,11 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.ixsvf.almanaboca.R
 import com.ixsvf.almanaboca.viewmodel.SessionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,6 +38,16 @@ fun UserScreen(
     // Estado para controlar o Alerta de Confirmação
     var showDeleteDialog by remember { mutableStateOf(false) }
 
+
+    val appVersion = remember {
+        try {
+            val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+            "v${packageInfo.versionName}"
+        } catch (e: Exception) {
+            ""
+        }
+    }
+
     LaunchedEffect(Unit) {
         sessionViewModel.checkChatAccess()
     }
@@ -44,9 +56,9 @@ fun UserScreen(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Eliminar Conta") },
+            title = { Text(stringResource(R.string.lbl_delete_account)) },
             text = {
-                Text("Tem a certeza que deseja eliminar a sua conta permanentemente? Esta ação não pode ser desfeita e perderá o acesso à comunidade.")
+                Text(stringResource(R.string.lbl_delete_account_confirmation))
             },
             confirmButton = {
                 Button(
@@ -54,7 +66,7 @@ fun UserScreen(
                         showDeleteDialog = false
                         sessionViewModel.deleteAccount(
                             onSuccess = {
-                                Toast.makeText(context, "Conta eliminada com sucesso.", Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, R.string.lbl_delete_account_sucess, Toast.LENGTH_LONG).show()
                                 navController.navigate("login_screen") { // Usa o nome exato da tua rota de login
                                     popUpTo(0) { inclusive = true }
                                 }
@@ -66,12 +78,12 @@ fun UserScreen(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
                 ) {
-                    Text("Sim, eliminar")
+                    Text(stringResource(R.string.lbl_delete_account_yes))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancelar")
+                    Text(stringResource(R.string.lbl_cancel))
                 }
             },
             icon = { Icon(Icons.Default.DeleteForever, contentDescription = null) }
@@ -81,10 +93,10 @@ fun UserScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("A minha conta", fontSize = 18.sp, fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.lbl_my_account), fontSize = 18.sp, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.lbl_back))
                     }
                 }
             )
@@ -117,7 +129,7 @@ fun UserScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = if (realName.isNotBlank()) realName else (currentUser?.displayName ?: "Utilizador"),
+                text = realName.ifBlank { (currentUser?.displayName ?: stringResource(R.string.lbl_user)) },
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -152,7 +164,7 @@ fun UserScreen(
             ) {
                 Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null, tint = Color.White)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("TERMINAR SESSÃO", fontWeight = FontWeight.Bold, color = Color.White)
+                Text(stringResource(R.string.lbl_logout), fontWeight = FontWeight.Bold, color = Color.White)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -164,8 +176,17 @@ fun UserScreen(
             ) {
                 Icon(Icons.Default.DeleteForever, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Eliminar conta permanentemente", fontSize = 12.sp)
+                Text(stringResource(R.string.lbl_delete_account_permanentely), fontSize = 12.sp)
             }
+
+            Spacer(modifier = Modifier.height(16.dp)) // Espaço final
+
+            Text(
+                text = appVersion,
+                fontSize = 12.sp,
+                color = Color.LightGray,
+                fontWeight = FontWeight.Normal
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
         }
@@ -179,8 +200,8 @@ fun StatusCard(isActive: Boolean) {
     val containerColor = if (isActive) Color(0xFFE8F5E9) else Color(0xFFFFEBEE)
     val contentColor = if (isActive) Color(0xFF2E7D32) else Color(0xFFC62828)
     val icon = if (isActive) Icons.Default.CheckCircle else Icons.Default.Lock
-    val statusText = if (isActive) "ATIVO" else "INATIVO"
-    val description = if (isActive) "Tens acesso exclusivo ao chat da comunidade." else "Subscrição necessária para aceder."
+    val statusText = if (isActive) stringResource(R.string.lbl_enable) else stringResource(R.string.lbl_disable)
+    val description = if (isActive) stringResource(R.string.lbl_community_access_granted) else stringResource(R.string.lbl_community_access_need)
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -202,7 +223,7 @@ fun StatusCard(isActive: Boolean) {
             Spacer(modifier = Modifier.width(16.dp))
             Column {
                 Text(
-                    text = "Comunidade AlmanaBoca",
+                    text = stringResource(R.string.lbl_community_almanaboca),
                     fontSize = 14.sp,
                     color = Color.Black.copy(alpha = 0.7f)
                 )

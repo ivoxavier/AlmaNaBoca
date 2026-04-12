@@ -7,6 +7,8 @@
     <string name="lbl_login_to_account">Login into Your Account</string>
     <string name="lbl_lost_password">Lost Password</string>
     <string name="lbl_account">Account</string>
+    <string name="lbl_user">User</string>
+    <string name="lbl_my_account">My Account</string>
     <string name="lbl_password">Password</string>
     <string name="lbl_welcome">Welcome</string>
     <string name="lbl_coach_programs_available">Coach Programs Available</string>
@@ -21,6 +23,7 @@
     <string name="lbl_meditations_join_us">Join our meditations circles to reach your balance.</string>
     <string name="lbl_meditations_type">Phisically</string>
     <string name="lbl_find_me">Find Me</string>
+    <string name="lbl_logout">LOG OUT</string>
     <string name="lbl_about_me">About Me</string>
     <string name="lbl_error_triggered">An error occurred</string>
     <string name="lbl_booking_made">Booking Approved!</string>
@@ -42,8 +45,39 @@
     <string name="lbl_error">Error</string>
     <string name="lbl_cancel">Cancel</string>
     <string name="lbl_close">Close</string>
+    <string name="lbl_back">Back</string>
+    <string name="lbl_enable">Enable</string>
+    <string name="lbl_disable">Disable</string>
+    <string name="lbl_access">Access</string>
+    <string name="lbl_vacancies">Vacancies</string>
+    <string name="lbl_dates">Dates</string>
+    <string name="lbl_single">Single</string>
+    <string name="lbl_dates_to_announced">Dates to be announced</string>
     <string name="lbl_developed_by">Developed by</string>
     <string name="lbl_marta_banner">Hi I am Marta</string>
     <string name="lbl_marta_banner_mission">My mission is to help you find your voice and your balance...</string>
+    <string name="lbl_investment_option">Investment Options</string>
+    <string name="lbl_payment_option">Payment Option</string>
+    <string name="lbl_program_detail">Program Detail</string>
+    <string name="lbl_program_not_found">Program Not Found</string>
+    <string name="lbl_what_to_expect">What to expect</string>
+    <string name="lbl_no_description">Whitout description</string>
+    <string name="lbl_ideal_for">Ideal For</string>
+    <string name="lbl_your_journey">Your journey</string>
+    <string name="lbl_what_will_achieve">What will you achieve</string>
+    <string name="lbl_whatsapp_error">Error on opening WhatsApp</string>
+    <string name="lbl_sign_me">I want to sign in</string>
+    <string name="lbl_sign_me_message">Hi Marta! I want to register for the program:</string>
+    <string name="lbl_vacancies_available">vacancies available</string>
+    <string name="lbl_discount_included">discount included</string>
+    <string name="lbl_coach_type">Coach type</string>
+    <string name="lbl_delete_account">Delete Account</string>
+    <string name="lbl_delete_account_yes">Yes, Delete Account</string>
+    <string name="lbl_delete_account_sucess">Account Deleted Successfuly</string>
+    <string name="lbl_delete_account_confirmation">Are you sure you want to permanently delete your account? This action cannot be undone, and you will lose access to the community.</string>
+    <string name="lbl_delete_account_permanentely">Delete Account Permanently</string>
+    <string name="lbl_community_access_granted">You have exclusive access to the community chat.</string>
+    <string name="lbl_community_access_need">Subscription required for access.</string>
+    <string name="lbl_community_almanaboca">AlmanaBoca Community</string>
 
 </resources>

@@ -14,6 +14,11 @@ data class HomeItem(
     val option2WhatToExpect: String = "",
     val coachDiscount: Double = 0.0,
     val coachVacancies: Int = 0,
+    val idealFor: String = "",
+    val contentAccess: String = "",
+    val theResult: String = "",
+    val youWillExperience: String = "",
+    val coachType: String ="",
 
     // Links
     val instagramUrl: String = "",

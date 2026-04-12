@@ -34,6 +34,11 @@ class HomeRepository {
                                     whatToExpectProgram = item["whatToExpectProgram"]?.toString() ?: "",
                                     coachStartDate = item["coachStartDate"]?.toString() ?: "",
                                     coachDateEnd = item["coachDateEnd"]?.toString() ?: "",
+                                    idealFor = item["idealFor"]?.toString()?:"",
+                                    theResult = item["theResult"]?.toString()?:"",
+                                    youWillExperience = item["youWillExperience"]?.toString()?:"",
+                                    contentAccess = item["contentAccess"]?.toString()?:"",
+                                    coachType = item["coachType"]?.toString()?:"",
 
                                     // Conversões Seguras para Números
                                     coachDiscount = parseDouble(item["coachDiscount"]),

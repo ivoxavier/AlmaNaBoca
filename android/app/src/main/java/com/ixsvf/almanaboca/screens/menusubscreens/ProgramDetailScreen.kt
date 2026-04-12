@@ -10,12 +10,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.Devices
 import androidx.compose.material.icons.outlined.Groups
-import androidx.compose.material.icons.outlined.LocalOffer
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Stars
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -38,14 +39,10 @@ import com.ixsvf.almanaboca.ui.theme.states.HomeUiState
 import com.ixsvf.almanaboca.viewmodel.HomeViewModel
 import java.net.URLEncoder
 
-// Cores do tema (Reutilizadas da HomeScreen)
 private val BrandRedMain = Color(0xFFC62828)
 private val WhatsAppGreen = Color(0xFF25D366)
-//private val TextGray = Color(0xFF6B7280)
-//private val TextDark = Color(0xFF1F2937)
 private val BackgroundLight = Color(0xFFF9F9F9)
 
-// Número da Marta para inscrições
 private const val TARGET_WHATSAPP_NUMBER = AlmanaBocaConstants.ADMINS.MARTA_NUMBER
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,7 +55,6 @@ fun ProgramDetailScreen(
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
-    // Tenta encontrar o programa específico na lista carregada
     val programItem = remember(uiState, programName) {
         (uiState as? HomeUiState.Success)?.courses?.find { it.coachProgram == programName }
     }
@@ -69,7 +65,7 @@ fun ProgramDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Detalhes do Programa",
+                        text = stringResource(R.string.lbl_program_detail),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = TextDark
@@ -79,7 +75,7 @@ fun ProgramDetailScreen(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Voltar",
+                            contentDescription = stringResource(R.string.lbl_back),
                             tint = TextDark
                         )
                     }
@@ -89,9 +85,8 @@ fun ProgramDetailScreen(
         }
     ) { padding ->
         if (programItem == null) {
-            // Estado de erro ou item não encontrado
             Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                Text("Programa não encontrado.", color = Color.Gray)
+                Text(stringResource(R.string.lbl_program_not_found), color = Color.Gray)
             }
         } else {
             Column(
@@ -100,7 +95,6 @@ fun ProgramDetailScreen(
                     .padding(padding)
                     .background(Color.White)
             ) {
-                // Conteúdo Scrollable
                 Column(
                     modifier = Modifier
                         .weight(1f)
@@ -109,20 +103,20 @@ fun ProgramDetailScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    // --- CABEÇALHO DO PROGRAMA ---
-                    Box(
-                        modifier = Modifier
-                            .size(80.dp)
-                            .background(BrandRedMain.copy(alpha = 0.1f), RoundedCornerShape(20.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Groups,
-                            contentDescription = null,
-                            tint = BrandRedMain,
-                            modifier = Modifier.size(40.dp)
-                        )
-                    }
+                    // --- CABEÇALHO ---
+//                    Box(
+//                        modifier = Modifier
+//                            .size(80.dp)
+//                            .background(BrandRedMain.copy(alpha = 0.1f), RoundedCornerShape(20.dp)),
+//                        contentAlignment = Alignment.Center
+//                    ) {
+//                        Icon(
+//                            imageVector = Icons.Outlined.Stars,
+//                            contentDescription = null,
+//                            tint = BrandRedMain,
+//                            modifier = Modifier.size(40.dp)
+//                        )
+//                    }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -138,33 +132,72 @@ fun ProgramDetailScreen(
                     Spacer(modifier = Modifier.height(32.dp))
 
                     // --- SECÇÃO: O QUE ESPERAR ---
-                    DetailSectionTitle(title = "O que esperar")
+                    DetailSectionTitle(title = stringResource(R.string.lbl_what_to_expect))
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = programItem.whatToExpectProgram.ifEmpty { "Sem descrição disponível." },
+                        text = programItem.whatToExpectProgram.ifEmpty { stringResource(R.string.lbl_no_description) },
                         fontSize = 15.sp,
                         color = TextGray,
                         lineHeight = 22.sp
                     )
 
+                    // --- NOVA SECÇÃO: IDEAL PARA ---
+                    if (programItem.idealFor.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(32.dp))
+                        DetailSectionTitle(title = stringResource(R.string.lbl_ideal_for))
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = programItem.idealFor,
+                            fontSize = 15.sp,
+                            color = TextGray,
+                            lineHeight = 22.sp
+                        )
+                    }
+
+                    // --- NOVA SECÇÃO: A TUA EXPERIÊNCIA ---
+                    if (programItem.youWillExperience.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(32.dp))
+                        DetailSectionTitle(title = stringResource(R.string.lbl_your_journey))
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = programItem.youWillExperience,
+                            fontSize = 15.sp,
+                            color = TextGray,
+                            lineHeight = 22.sp
+                        )
+                    }
+
+                    // --- NOVA SECÇÃO: O RESULTADO ---
+                    if (programItem.theResult.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(32.dp))
+                        DetailSectionTitle(title = stringResource(R.string.lbl_what_will_achieve))
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = BrandRedMain.copy(alpha = 0.05f)),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = programItem.theResult,
+                                fontSize = 15.sp,
+                                color = TextDark,
+                                fontWeight = FontWeight.Medium,
+                                lineHeight = 22.sp,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
+
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    // --- ESPAÇO PARA NOVAS VARIÁVEIS (Ex: Vantagens, Conteúdos) ---
-                    // Exemplo de como adicionar:
-                    // if (programItem.novasVantagens.isNotEmpty()) {
-                    //     DetailSectionTitle(title = "Vantagens")
-                    //     BulletPointsList(programItem.novasVantagens)
-                    //     Spacer(modifier = Modifier.height(32.dp))
-                    // }
-
-                    // --- INFORMAÇÕES CHAVE (Cartão Flutuante) ---
+                    // --- INFORMAÇÕES CHAVE (Incluindo Acesso ao Conteúdo) ---
                     InfoSummaryCard(item = programItem)
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    // --- OPÇÕES DE PAGAMENTO (Se existirem) ---
+                    // --- OPÇÕES DE PAGAMENTO ---
                     if (programItem.coachPriceOption1 > 0 || programItem.coachPriceOption2 > 0) {
-                        DetailSectionTitle(title = "Opções de Investimento")
+                        DetailSectionTitle(title = stringResource(R.string.lbl_investment_option))
                         Spacer(modifier = Modifier.height(16.dp))
 
                         if (programItem.coachPriceOption1 > 0) {
@@ -176,21 +209,21 @@ fun ProgramDetailScreen(
                             Spacer(modifier = Modifier.height(12.dp))
                         }
 
-                        if (programItem.coachPriceOption2 > 0) {
+                        //Temporary NOTSHOWING THIS
+                        if (programItem.coachPriceOption2 < 0) {
                             PaymentOptionCard(
                                 price = programItem.coachPriceOption2,
                                 description = programItem.option2WhatToExpect,
-                                discount = 0.0 // Assumindo desconto apenas na opção 1 (geralmente pronto pagamento)
+                                discount = 0.0
                             )
                         }
                         Spacer(modifier = Modifier.height(32.dp))
                     }
 
-                    // Espaço extra no fundo para o scroll não colar no botão
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                // --- BOTÃO FIXO NO FUNDO: INSCRIÇÃO ---
+                // --- BOTÃO FIXO NO FUNDO ---
                 Surface(
                     modifier = Modifier.fillMaxWidth().shadow(16.dp),
                     color = Color.White,
@@ -200,14 +233,14 @@ fun ProgramDetailScreen(
                         Button(
                             onClick = {
                                 try {
-                                    val message = "Olá Marta! Gostaria de me inscrever no programa: ${programItem.coachProgram}."
+                                    val message = "Olá! Gostaria de me inscrever no programa: ${programItem.coachProgram}."
                                     val encodedMessage = URLEncoder.encode(message, "UTF-8")
                                     val url = "https://wa.me/$TARGET_WHATSAPP_NUMBER?text=$encodedMessage"
                                     val intent = Intent(Intent.ACTION_VIEW)
                                     intent.data = Uri.parse(url)
                                     context.startActivity(intent)
                                 } catch (e: Exception) {
-                                    Toast.makeText(context, "Erro ao abrir WhatsApp", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, R.string.lbl_whatsapp_error, Toast.LENGTH_SHORT).show()
                                 }
                             },
                             modifier = Modifier.fillMaxWidth().height(52.dp),
@@ -218,7 +251,7 @@ fun ProgramDetailScreen(
                             Icon(Icons.Default.Send, contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                text = "QUERO ME INSCREVER",
+                                text = stringResource(R.string.lbl_sign_me),
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White,
                                 fontSize = 16.sp
@@ -230,6 +263,46 @@ fun ProgramDetailScreen(
         }
     }
 }
+
+@Composable
+fun InfoSummaryCard(item: HomeItem) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = BackgroundLight),
+        shape = RoundedCornerShape(16.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.3f))
+    ) {
+        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+
+            // DATAS
+            val dates = if (item.coachStartDate.isNotEmpty()) "${item.coachStartDate} - ${item.coachDateEnd}" else stringResource(R.string.lbl_dates_to_announced)
+            InfoRowDetail(icon = Icons.Outlined.CalendarMonth, title = stringResource(R.string.lbl_dates), value = dates)
+
+            HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
+
+            // VAGAS
+            InfoRowDetail(icon = Icons.Outlined.Groups, title = stringResource(R.string.lbl_vacancies), value = "${item.coachVacancies} " + stringResource(R.string.lbl_vacancies_available))
+
+            // --- NOVO: FORMATO (Individual ou Grupo) ---
+            if (item.coachType.isNotEmpty()) {
+                HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
+                InfoRowDetail(
+                    icon = Icons.Outlined.Groups,
+                    title = stringResource(R.string.lbl_coach_type),
+                    value = item.coachType
+                )
+            }
+
+            // ACESSO
+            if (item.contentAccess.isNotEmpty()) {
+                HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
+                InfoRowDetail(icon = Icons.Outlined.Devices, title = stringResource(R.string.lbl_access), value = item.contentAccess)
+            }
+        }
+    }
+}
+
+
 
 // --- COMPONENTES AUXILIARES DE DESIGN ---
 
@@ -248,29 +321,7 @@ fun DetailSectionTitle(title: String) {
     }
 }
 
-@Composable
-fun InfoSummaryCard(item: HomeItem) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = BackgroundLight),
-        shape = RoundedCornerShape(16.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.3f))
-    ) {
-        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
-            val dates = if (item.coachStartDate.isNotEmpty()) "${item.coachStartDate} - ${item.coachDateEnd}" else "Datas a anunciar"
-            InfoRowDetail(icon = Icons.Outlined.CalendarMonth, title = "Datas", value = dates)
-
-            HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
-
-            InfoRowDetail(icon = Icons.Outlined.Groups, title = "Vagas", value = "${item.coachVacancies} vagas disponíveis")
-
-            // --- ESPAÇO PARA NOVAS VARIÁVEIS (Ex: Duração, Formato) ---
-            // HorizontalDivider(...)
-            // InfoRowDetail(icon = Icons.Outlined.Timer, title = "Duração", value = item.novaDuracao)
-        }
-    }
-}
 
 @Composable
 fun InfoRowDetail(icon: ImageVector, title: String, value: String) {
@@ -297,9 +348,9 @@ fun PaymentOptionCard(price: Double, description: String, discount: Double) {
             Icon(Icons.Default.CheckCircle, null, tint = BrandRedMain, modifier = Modifier.size(24.dp))
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = description.ifEmpty { "Opção de pagamento" }, fontSize = 14.sp, color = TextDark, fontWeight = FontWeight.Medium)
+                Text(text = description.ifEmpty { stringResource(R.string.lbl_payment_option) }, fontSize = 14.sp, color = TextDark, fontWeight = FontWeight.Medium)
                 if (discount > 0) {
-                    Text(text = "${discount.toInt()}% de desconto incluído", fontSize = 12.sp, color = Color(0xFF2E7D32), fontWeight = FontWeight.Bold)
+                    Text(text = "${discount.toInt()}%" + stringResource(R.string.lbl_discount_included), fontSize = 12.sp, color = Color(0xFF2E7D32), fontWeight = FontWeight.Bold)
                 }
             }
             Spacer(modifier = Modifier.width(16.dp))
