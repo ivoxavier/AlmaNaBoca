@@ -3,6 +3,7 @@ package com.ixsvf.almanaboca.screens.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -126,12 +127,20 @@ fun BottomNavigationBar(navController: NavController) {
                 // A borda branca cria o efeito de recorte na barra
                 .border(BorderStroke(5.dp, Color.White), CircleShape)
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.almanaboca_white),
-                contentDescription = "Home",
-                modifier = Modifier.size(76.dp),
-                tint = Color.Unspecified
-            )
+            // USAR UM BOX PARA FORÇAR O CENTRAMENTO TOTAL
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.almanaboca_white),
+                    contentDescription = "Home",
+                    // O tamanho deve ser menor que o FAB (72dp) menos a borda (5dp de cada lado)
+                    // 50dp a 55dp costuma ser o ideal para não tocar nas bordas
+                    modifier = Modifier.size(55.dp),
+                    tint = Color.Unspecified
+                )
+            }
         }
     }
 }
