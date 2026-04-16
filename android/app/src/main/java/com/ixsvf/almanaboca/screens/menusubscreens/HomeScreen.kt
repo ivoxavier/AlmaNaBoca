@@ -255,7 +255,7 @@ fun ProgramCarouselCard(item: HomeItem, onClick: () -> Unit) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(item.coachProgram.ifEmpty { "Programa" }, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = TextDark, maxLines = 2)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(item.whatToExpectProgram.ifEmpty { "Sem descrição." }, style = MaterialTheme.typography.bodySmall, color = TextGray, maxLines = 4)
+            Text(item.whatToExpectProgram.ifEmpty { stringResource(R.string.lbl_no_description) }, style = MaterialTheme.typography.bodySmall, color = TextGray, maxLines = 4)
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
             Spacer(modifier = Modifier.height(12.dp))
