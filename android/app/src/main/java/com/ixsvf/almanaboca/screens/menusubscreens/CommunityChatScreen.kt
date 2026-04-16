@@ -16,11 +16,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.ixsvf.almanaboca.R
 import com.ixsvf.almanaboca.services.model.ChatMessage
 import com.ixsvf.almanaboca.viewmodel.ChatViewModel
 import com.ixsvf.almanaboca.viewmodel.SessionViewModel
@@ -52,11 +54,11 @@ fun CommunityChatScreen(
         containerColor = Color(0xFFF5F5F5), // Cor de fundo geral do ecrã
         topBar = {
             TopAppBar(
-                title = { Text("Comunidade", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.lbl_community_almanaboca), fontWeight = FontWeight.Bold) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFF5F5F5)),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.lbl_back))
                     }
                 }
             )
@@ -121,7 +123,7 @@ fun CommunityChatScreen(
                         value = messageText,
                         onValueChange = { messageText = it },
                         modifier = Modifier.weight(1f),
-                        placeholder = { Text("Escreve algo...", color = Color.Gray) },
+                        placeholder = { Text(stringResource(R.string.lbl_say_something) + "...", color = Color.Gray) },
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
@@ -155,7 +157,7 @@ fun CommunityChatScreen(
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.Send,
-                            contentDescription = "Enviar",
+                            contentDescription = stringResource(R.string.lbl_send),
                             modifier = Modifier.size(20.dp),
                             tint = if (messageText.isNotBlank()) Color.White else Color.Gray
                         )
@@ -189,7 +191,7 @@ fun ChatBubble(msg: ChatMessage, isMine: Boolean) {
         // --- NOME DO REMETENTE ---
         if (!isMine) {
             Text(
-                text = msg.senderName.ifBlank { "Desconhecido" },
+                text = msg.senderName.ifBlank { stringResource(R.string.lbl_unknown) },
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 color = nameColor,

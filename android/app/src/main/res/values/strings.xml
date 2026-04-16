@@ -79,5 +79,8 @@
     <string name="lbl_community_access_granted">You have exclusive access to the community chat.</string>
     <string name="lbl_community_access_need">Subscription required for access.</string>
     <string name="lbl_community_almanaboca">AlmanaBoca Community</string>
+    <string name="lbl_say_something">Say something</string>
+    <string name="lbl_send">Send</string>
+    <string name="lbl_unknown">Unknow</string>
 
 </resources>
