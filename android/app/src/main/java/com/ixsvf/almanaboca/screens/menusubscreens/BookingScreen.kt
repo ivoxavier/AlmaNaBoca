@@ -26,10 +26,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ixsvf.almanaboca.R
 import com.ixsvf.almanaboca.screens.components.PaddingBox
 import com.ixsvf.almanaboca.screens.components.SummaryTopPageText
 import com.ixsvf.almanaboca.viewmodel.BookingViewModel
@@ -132,7 +134,7 @@ fun BookingScreen(
                 .padding(innerPadding)
         ) {
             PaddingBox {
-                SummaryTopPageText(if (isAdmin) "Gestão de Reservas" else "Minhas Marcações")
+                SummaryTopPageText(if (isAdmin) stringResource(R.string.lbl_bookings_management) else stringResource(R.string.lbl_my_bookings))
             }
 
             if (isLoading) {

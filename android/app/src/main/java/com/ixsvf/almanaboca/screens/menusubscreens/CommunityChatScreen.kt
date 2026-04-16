@@ -55,7 +55,6 @@ fun CommunityChatScreen(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.lbl_community_almanaboca), fontWeight = FontWeight.Bold) },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFF5F5F5)),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.lbl_back))

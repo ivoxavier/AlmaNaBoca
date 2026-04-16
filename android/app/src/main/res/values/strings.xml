@@ -82,5 +82,7 @@
     <string name="lbl_say_something">Say something</string>
     <string name="lbl_send">Send</string>
     <string name="lbl_unknown">Unknow</string>
+    <string name="lbl_bookings_management">Bookings Management</string>
+    <string name="lbl_shop_almanaboca">Shop</string>
 
 </resources>
