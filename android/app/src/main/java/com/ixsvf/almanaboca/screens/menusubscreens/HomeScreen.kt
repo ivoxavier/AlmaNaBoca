@@ -339,10 +339,10 @@ fun MeditationCircleCard(item: HomeItem, userName: String) {
             Spacer(modifier = Modifier.height(8.dp))
             DetailRowSmall(Icons.Outlined.LocationOn, item.meditationCirclesLocation.ifEmpty { stringResource(R.string.lbl_meditations_type) })
 
-            if (item.meditationCirclesPrice > 0.0) {
-                Spacer(modifier = Modifier.height(8.dp))
-                DetailRowSmall(Icons.Outlined.LocalOffer, "${item.meditationCirclesPrice} €")
-            }
+//            if (item.meditationCirclesPrice > 0.0) {
+//                Spacer(modifier = Modifier.height(8.dp))
+//                DetailRowSmall(Icons.Outlined.LocalOffer, "${item.meditationCirclesPrice} €")
+//            }
 
             // --- BOTÃO DE INSCRIÇÃO ---
             Spacer(modifier = Modifier.height(16.dp))
