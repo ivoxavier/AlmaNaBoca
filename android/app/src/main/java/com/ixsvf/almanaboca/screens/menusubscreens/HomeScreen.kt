@@ -201,6 +201,26 @@ fun HomeScreen(
                             )
                         }
 
+                        PaddingBox { SummaryTopPageText(stringResource(R.string.lbl_shop_almanaboca)) }
+
+                        PaddingBox {
+                            CommunityCard(onClick = {
+                                // Mostra feedback visual que está a verificar (opcional, mas bom UX)
+                                // Aqui fazemos a verificação em tempo real:
+                                sessionViewModel.verifyAccessNow(
+                                    onSuccess = {
+                                        // Se o Firebase disser que sim AGORA:
+                                        navController.navigate("community_chat")
+                                    },
+                                    onFailure = {
+                                        // Se o Firebase disser que não ou der erro:
+                                        Toast.makeText(context, "Acesso negado. Verifica a tua subscrição.", Toast.LENGTH_LONG).show()
+                                    }
+                                )
+                            }
+                            )
+                        }
+
                         Spacer(modifier = Modifier.height(12.dp))
 
                         // Sobre Mim
