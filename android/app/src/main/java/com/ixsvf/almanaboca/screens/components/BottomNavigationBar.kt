@@ -28,11 +28,10 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ixsvf.almanaboca.R
 import com.ixsvf.almanaboca.screens.BottomBarScreen
+import com.ixsvf.almanaboca.ui.theme.BrandRedLight
+import com.ixsvf.almanaboca.ui.theme.IconGray
+import com.ixsvf.almanaboca.ui.theme.BrandRed
 
-// Cores da Marca
-private val BrandRed = Color(0xFF9E1919)
-private val BrandRedLight = Color(0xFFFFE5E5)
-private val IconGray = Color(0xFF9CA3AF)
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
@@ -56,7 +55,7 @@ fun BottomNavigationBar(navController: NavController) {
                 .align(Alignment.BottomCenter) // Alinhada ao fundo
                 .shadow(elevation = 16.dp, shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
                 .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)),
-            containerColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.surface,
             tonalElevation = 0.dp
         ) {
             screens.forEach { screen ->
