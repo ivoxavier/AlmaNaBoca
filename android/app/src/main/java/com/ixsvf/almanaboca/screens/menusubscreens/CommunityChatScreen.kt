@@ -51,7 +51,7 @@ fun CommunityChatScreen(
     }
 
     Scaffold(
-        containerColor = Color(0xFFF5F5F5), // Cor de fundo geral do ecrã
+        containerColor = Color(0xFFF5F5F5),
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.lbl_community_almanaboca), fontWeight = FontWeight.Bold) },
@@ -63,103 +63,95 @@ fun CommunityChatScreen(
             )
         }
     ) { padding ->
-        Column(
+        // --- USAMOS BOX PARA CRIAR A STACK ---
+        Box(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
-                .background(Color(0xFFF5F5F5)) // Garante fundo cinza atrás de tudo
+                .background(Color(0xFFF5F5F5))
         ) {
 
-            // --- CAIXA BRANCA COM A LISTA DE MENSAGENS ---
-            Surface(
-                modifier = Modifier
-                    .weight(1f) // Ocupa todo o espaço disponível menos o input
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 1.dp), // Margem para ver o fundo cinza
-                color = Color.White, // Fundo branco pedido
-                shape = RoundedCornerShape(24.dp), // Arredondamento em cima e em baixo
-                shadowElevation = 2.dp // Pequena sombra para destacar (opcional)
+            // 1. A LISTA DE MENSAGENS (Fica por baixo)
+            LazyColumn(
+                state = scrollState,
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                // IMPORTANTE: O bottom padding deve ser suficiente para a mensagem
+                // não ficar escondida atrás do input (ex: 90dp)
+                contentPadding = PaddingValues(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 100.dp)
             ) {
-                LazyColumn(
-                    state = scrollState,
-                    modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(vertical = 16.dp)
-                ) {
-                    items(items = messages) { msg ->
-                        // --- ANIMAÇÃO DE ENTRADA ---
-                        AnimatedVisibility(
-                            visible = true,
-                            enter = fadeIn(animationSpec = tween(400)) +
-                                    slideInVertically(initialOffsetY = { 50 }, animationSpec = tween(400)),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            val isMine = msg.senderId == currentUser?.uid
-                            ChatBubble(msg, isMine)
-                        }
+                items(items = messages) { msg ->
+                    val isMine = msg.senderId == currentUser?.uid
+
+                    AnimatedVisibility(
+                        visible = true,
+                        enter = fadeIn(tween(400)) + slideInVertically(initialOffsetY = { 50 },
+                            animationSpec = tween(400)
+                        )
+                    ) {
+                        ChatBubble(msg, isMine)
                     }
                 }
             }
 
-            // --- INPUT DE MENSAGEM ARREDONDADO ---
-            Surface(
+            // 2. O INPUT DE MENSAGEM (Fica por cima, flutuando no fundo)
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .navigationBarsPadding() // Protege contra a barra de navegação do Android
-                    .imePadding() // Sobe com o teclado
-                    .padding(bottom = 12.dp, start = 10.dp, end = 12.dp), // Espaçamento externo
-                tonalElevation = 8.dp,
-                shadowElevation = 4.dp,
-                shape = RoundedCornerShape(24.dp),
-                color = Color.White
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                contentAlignment = Alignment.BottomCenter
             ) {
-                Row(
+                Surface(
                     modifier = Modifier
-                        .padding(horizontal = 4.dp, vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .fillMaxWidth()
+                        .navigationBarsPadding()
+                        .imePadding(),
+                    tonalElevation = 8.dp,
+                    shadowElevation = 12.dp, // Sombra maior para dar o efeito de flutuar
+                    shape = RoundedCornerShape(24.dp),
+                    color = Color.White.copy(alpha = 0.95f) // Ligeira transparência se quiseres
                 ) {
-                    TextField(
-                        value = messageText,
-                        onValueChange = { messageText = it },
-                        modifier = Modifier.weight(1f),
-                        placeholder = { Text(stringResource(R.string.lbl_say_something) + "...", color = Color.Gray) },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            cursorColor = AccentPurple
-                        ),
-                        maxLines = 4
-                    )
-
-                    // Botão Enviar
-                    IconButton(
-                        onClick = {
-                            if (messageText.isNotBlank()) {
-                                chatViewModel.sendMessage(
-                                    messageText,
-                                    currentUser?.uid ?: "",
-                                    realName
-                                )
-                                messageText = ""
-                            }
-                        },
-                        enabled = messageText.isNotBlank(),
-                        modifier = Modifier
-                            .padding(end = 4.dp)
-                            .size(44.dp)
-                            .background(
-                                if (messageText.isNotBlank()) AccentPurple else Color(0xFFF0F0F0),
-                                RoundedCornerShape(50)
-                            )
+                    Row(
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.Send,
-                            contentDescription = stringResource(R.string.lbl_send),
-                            modifier = Modifier.size(20.dp),
-                            tint = if (messageText.isNotBlank()) Color.White else Color.Gray
+                        TextField(
+                            value = messageText,
+                            onValueChange = { messageText = it },
+                            modifier = Modifier.weight(1f),
+                            placeholder = { Text(stringResource(R.string.lbl_say_something) + "...", color = Color.Gray) },
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                cursorColor = AccentPurple
+                            ),
+                            maxLines = 4
                         )
+
+                        IconButton(
+                            onClick = {
+                                if (messageText.isNotBlank()) {
+                                    chatViewModel.sendMessage(messageText, currentUser?.uid ?: "", realName)
+                                    messageText = ""
+                                }
+                            },
+                            enabled = messageText.isNotBlank(),
+                            modifier = Modifier
+                                .size(44.dp)
+                                .background(
+                                    if (messageText.isNotBlank()) AccentPurple else Color(0xFFF0F0F0),
+                                    RoundedCornerShape(50)
+                                )
+                        ) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.Send,
+                                contentDescription = stringResource(R.string.lbl_send),
+                                modifier = Modifier.size(20.dp),
+                                tint = if (messageText.isNotBlank()) Color.White else Color.Gray
+                            )
+                        }
                     }
                 }
             }
