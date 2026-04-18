@@ -20,6 +20,7 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.Headphones
+import androidx.compose.material.icons.outlined.LocalMall
 import androidx.compose.material.icons.outlined.LocalOffer
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.*
@@ -27,6 +28,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
@@ -38,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImagePainter.State.Empty.painter
 import com.ixsvf.almanaboca.R
 import com.ixsvf.almanaboca.constants.AlmanaBocaConstants
 import com.ixsvf.almanaboca.screens.components.AlmanaBocaLogo
@@ -204,21 +207,9 @@ fun HomeScreen(
                         PaddingBox { SummaryTopPageText(stringResource(R.string.lbl_shop_almanaboca)) }
 
                         PaddingBox {
-                            CommunityCard(onClick = {
-                                // Mostra feedback visual que está a verificar (opcional, mas bom UX)
-                                // Aqui fazemos a verificação em tempo real:
-                                sessionViewModel.verifyAccessNow(
-                                    onSuccess = {
-                                        // Se o Firebase disser que sim AGORA:
-                                        navController.navigate("community_chat")
-                                    },
-                                    onFailure = {
-                                        // Se o Firebase disser que não ou der erro:
-                                        Toast.makeText(context, "Acesso negado. Verifica a tua subscrição.", Toast.LENGTH_LONG).show()
-                                    }
-                                )
-                            }
-                            )
+                            ShopCard(enabled = false,onClick = {
+                                navController.navigate("shop_screen")
+                            })
                         }
 
                         Spacer(modifier = Modifier.height(12.dp))
@@ -302,11 +293,15 @@ fun ProgramCarouselCard(item: HomeItem, onClick: () -> Unit) {
 fun MeditationCircleCard(item: HomeItem, userName: String) {
     val context = LocalContext.current
 
+    val tbdLabel = stringResource(R.string.lbl_date_to_be_determined)
+
+    val nextOneLabel = stringResource(R.string.lbl_next_one)
+
     // --- LÓGICA DE DATA E HORA ---
     // Pair<String, Boolean> -> O primeiro é o texto a mostrar, o segundo é se está aberto
     val sessionInfo = remember(item.meditationCirclesNextSession) {
         try {
-            if (item.meditationCirclesNextSession.isEmpty()) return@remember Pair("Data a definir", false)
+            if (item.meditationCirclesNextSession.isEmpty()) return@remember Pair(tbdLabel, false)
 
             // 1. Parse da data
             val formatter = DateTimeFormatter.ofPattern("[dd.MM.yyyy][dd/MM/yyyy]")
@@ -321,9 +316,9 @@ fun MeditationCircleCard(item: HomeItem, userName: String) {
             // 2. Determinar o texto a mostrar
             // Se a data da sessão for ANTERIOR a hoje (ontem ou antes), mostramos "Data a definir"
             val displayText = if (sessionDate.isBefore(today)) {
-                "Data a definir"
+                tbdLabel
             } else {
-                "Próxima: ${item.meditationCirclesNextSession}"
+                nextOneLabel + ": ${item.meditationCirclesNextSession}"
             }
 
             // 3. Determinar se o botão está ativo
@@ -332,7 +327,7 @@ fun MeditationCircleCard(item: HomeItem, userName: String) {
 
             Pair(displayText, isOpen)
         } catch (e: Exception) {
-            Pair("Data a definir", false)
+            Pair(tbdLabel, false)
         }
     }
 
@@ -390,7 +385,7 @@ fun MeditationCircleCard(item: HomeItem, userName: String) {
                 Icon(Icons.Default.Send, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = if (isRegistrationOpen) "INSCREVER AGORA" else "INSCRIÇÕES FECHADAS",
+                    text = if (isRegistrationOpen) stringResource(R.string.lbl_sign_me_now) else stringResource(R.string.lbl_registration_closed),
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
@@ -438,8 +433,74 @@ fun CommunityCard(onClick: () -> Unit) {
 }
 
 
+@Composable
+fun ShopCard(
+    enabled: Boolean = false, // Por defeito desativado como pedido
+    onClick: () -> Unit
+) {
+    Card(
+        // Se não estiver enabled, o onClick não faz nada
+        onClick = { if (enabled) onClick() },
+        colors = CardDefaults.cardColors(
+            containerColor = if (enabled) CardWhite else Color(0xFFF0F0F0) // Cor mais cinza se desativado
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = if (enabled) 4.dp else 0.dp // Remove a sombra se desativado
+        ),
+        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .graphicsLayer(alpha = if (enabled) 1f else 0.6f) // Torna o card meio transparente se desativado
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(50.dp)
+                    .background(
+                        if (enabled) AccentPurple.copy(alpha = 0.1f) else Color.LightGray.copy(alpha = 0.2f),
+                        RoundedCornerShape(12.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    // Usei LocalMall como fallback se não tiveres o ic_shop
+                    imageVector = Icons.Outlined.LocalMall,
+                    contentDescription = null,
+                    tint = if (enabled) AccentPurple else Color.Gray,
+                    modifier = Modifier.size(28.dp)
+                )
+            }
 
+            Spacer(modifier = Modifier.width(16.dp))
 
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.lbl_shop_almanaboca),
+                    fontWeight = FontWeight.Bold,
+                    color = if (enabled) TextDark else Color.Gray
+                )
+                Text(
+                    text = if (enabled) stringResource(R.string.lbl_explore_our_products) else stringResource(R.string.lbl_available_soon),
+                    fontSize = 12.sp,
+                    color = TextGray
+                )
+            }
+
+            if (enabled) {
+                Icon(
+                    imageVector = Icons.Default.Send,
+                    contentDescription = null,
+                    tint = AccentPurple.copy(alpha = 0.5f),
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+    }
+}
 
 @Composable
 fun DetailRowSmall(icon: ImageVector, text: String) {
@@ -479,8 +540,8 @@ fun SocialIconItem(iconRes: Int, contentDescription: String, onClick: () -> Unit
 fun SpotifyButton(spotifyUrl: String) {
     val uriHandler = LocalUriHandler.current
     Button(onClick = { uriHandler.openUri(spotifyUrl) }, colors = ButtonDefaults.buttonColors(containerColor = SpotifyGreen), shape = RoundedCornerShape(50), modifier = Modifier.fillMaxWidth().height(56.dp), elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)) {
-        Icon(Icons.Outlined.Headphones, null, tint = Color.White)
+        Icon(painter = painterResource(id = R.drawable.ic_spotify),contentDescription = "Spotify Logo",tint = Color.Unspecified)
         Spacer(modifier = Modifier.width(12.dp))
-        Text("Ouve-me no Spotify", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color.White)
+        Text(stringResource(R.string.lbl_listen_on_spotify), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color.White)
     }
 }

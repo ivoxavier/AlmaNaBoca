@@ -19,6 +19,7 @@ import com.ixsvf.almanaboca.screens.LoginScreen
 import com.ixsvf.almanaboca.screens.MenuScreen
 import com.ixsvf.almanaboca.screens.menusubscreens.CommunityChatScreen
 import com.ixsvf.almanaboca.screens.menusubscreens.ProgramDetailScreen
+import com.ixsvf.almanaboca.screens.menusubscreens.ShopScreen
 import com.ixsvf.almanaboca.screens.menusubscreens.UserScreen
 import com.ixsvf.almanaboca.screens.menusubscreens.YouTubeScreen
 import com.ixsvf.almanaboca.ui.theme.AlmaNaBocaTheme
@@ -119,6 +120,10 @@ fun AlmanaBocaNavigation(
 
         composable("user_screen") {
             UserScreen(navController = navController, sessionViewModel = sessionViewModel)
+        }
+
+        composable("shop_screen") {
+            ShopScreen(navController = navController)
         }
 
         composable("community_chat") {
