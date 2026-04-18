@@ -123,24 +123,18 @@ fun BottomNavigationBar(navController: NavController) {
             modifier = Modifier
                 .align(Alignment.BottomCenter) // IMPORTANTE: Alinha pelo fundo também
                 .offset(y = (-18).dp) // "Empurra" para cima apenas 25dp (menos que antes)
-                .size(72.dp)
+                .size(62.dp)
                 // A borda branca cria o efeito de recorte na barra
                 .border(BorderStroke(5.dp, Color.White), CircleShape)
         ) {
-            // USAR UM BOX PARA FORÇAR O CENTRAMENTO TOTAL
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.almanaboca_white),
-                    contentDescription = "Home",
-                    // O tamanho deve ser menor que o FAB (72dp) menos a borda (5dp de cada lado)
-                    // 50dp a 55dp costuma ser o ideal para não tocar nas bordas
-                    modifier = Modifier.size(55.dp),
-                    tint = Color.Unspecified
-                )
-            }
+            Icon(
+                painter = painterResource(id = R.drawable.almanaboca_white),
+                contentDescription = "Home",
+                // O tamanho deve ser menor que o FAB (72dp) menos a borda (5dp de cada lado)
+                // 50dp a 55dp costuma ser o ideal para não tocar nas bordas
+                modifier = Modifier.size(55.dp),
+                tint = Color.Unspecified
+            )
         }
     }
 }
