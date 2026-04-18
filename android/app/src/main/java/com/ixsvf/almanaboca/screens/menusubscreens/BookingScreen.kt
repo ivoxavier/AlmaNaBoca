@@ -123,7 +123,7 @@ fun BookingScreen(
                 FloatingActionButton(
                     onClick = { showDatePicker = true },
                     containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = Color.White
+                    contentColor = MaterialTheme.colorScheme.surface
                 ) { Icon(Icons.Default.Add, contentDescription = "Nova Marcação") }
             }
         }
@@ -145,7 +145,7 @@ fun BookingScreen(
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
                         text = if (isAdmin) "Sem pedidos pendentes." else "Ainda não tens marcações.",
-                        color = Color.Gray
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             } else {
@@ -155,10 +155,10 @@ fun BookingScreen(
                 ) {
                     items(bookings) { booking ->
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = Color.White),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                             elevation = CardDefaults.cardElevation(2.dp),
                             shape = RoundedCornerShape(16.dp), // Cantos mais redondos
-                            border = BorderStroke(0.5.dp, Color.LightGray.copy(alpha = 0.5f))
+                            border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
                         ) {
                             Column(modifier = Modifier.padding(16.dp)) {
 
@@ -213,7 +213,7 @@ fun BookingScreen(
                                             .background(Color(0xFFF5F5F5), RoundedCornerShape(12.dp))
                                             .padding(12.dp)
                                     ) {
-                                        Text("Dados do Cliente", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                                        Text("Dados do Cliente", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                         Spacer(modifier = Modifier.height(8.dp))
 
                                         ClientInfoRow(icon = Icons.Default.Person, text = booking.clientName, isBold = true)
@@ -275,7 +275,7 @@ fun BookingScreen(
                     items(slots) { slot ->
                         val isOccupied = occupiedSlots.contains(slot)
                         val backgroundColor = if (isOccupied) Color(0xFFF0F0F0) else MaterialTheme.colorScheme.primaryContainer
-                        val textColor = if (isOccupied) Color.Gray else MaterialTheme.colorScheme.onPrimaryContainer
+                        val textColor = if (isOccupied) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onPrimaryContainer
                         val border = if (isOccupied) null else BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
                         Box(
                             contentAlignment = Alignment.Center,
@@ -298,7 +298,7 @@ fun BookingScreen(
         var phone by remember { mutableStateOf("") }
         var service by remember { mutableStateOf("") }
         Dialog(onDismissRequest = { showBookingForm = false }) {
-            Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = Color.White)) {
+            Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Finalizar Marcação", style = MaterialTheme.typography.titleLarge)
                     Text("$selectedTimeSlot", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
@@ -313,7 +313,7 @@ fun BookingScreen(
                         onClick = { viewModel.addBooking(selectedDateMillis, selectedTimeSlot, name, phone, service) },
                         modifier = Modifier.fillMaxWidth(),
                         enabled = !isLoading
-                    ) { if (isLoading) CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White) else Text("Confirmar") }
+                    ) { if (isLoading) CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.surface) else Text("Confirmar") }
                 }
             }
         }

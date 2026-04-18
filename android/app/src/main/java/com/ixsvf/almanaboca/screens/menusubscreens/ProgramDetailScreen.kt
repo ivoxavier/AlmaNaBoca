@@ -35,13 +35,16 @@ import androidx.navigation.NavController
 import com.ixsvf.almanaboca.R
 import com.ixsvf.almanaboca.constants.AlmanaBocaConstants
 import com.ixsvf.almanaboca.services.model.HomeItem
+import com.ixsvf.almanaboca.ui.theme.BackgroundLight
+import com.ixsvf.almanaboca.ui.theme.BrandRedMain
+import com.ixsvf.almanaboca.ui.theme.TextDark
+import com.ixsvf.almanaboca.ui.theme.TextGray
+import com.ixsvf.almanaboca.ui.theme.WhatsAppGreen
 import com.ixsvf.almanaboca.ui.theme.states.HomeUiState
 import com.ixsvf.almanaboca.viewmodel.HomeViewModel
 import java.net.URLEncoder
 
-private val BrandRedMain = Color(0xFFC62828)
-private val WhatsAppGreen = Color(0xFF25D366)
-private val BackgroundLight = Color(0xFFF9F9F9)
+
 
 private const val TARGET_WHATSAPP_NUMBER = AlmanaBocaConstants.ADMINS.MARTA_NUMBER
 

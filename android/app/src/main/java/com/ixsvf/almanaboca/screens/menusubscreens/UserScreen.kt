@@ -121,7 +121,7 @@ fun UserScreen(
                         text = (realName.firstOrNull() ?: '?').toString().uppercase(),
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Gray
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -137,7 +137,7 @@ fun UserScreen(
             Text(
                 text = currentUser?.email ?: "",
                 fontSize = 14.sp,
-                color = Color.Gray
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -162,9 +162,9 @@ fun UserScreen(
                 shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.buttonElevation(4.dp)
             ) {
-                Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null, tint = Color.White)
+                Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null, tint = MaterialTheme.colorScheme.surface)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(stringResource(R.string.lbl_logout), fontWeight = FontWeight.Bold, color = Color.White)
+                Text(stringResource(R.string.lbl_logout), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.surface)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -172,7 +172,7 @@ fun UserScreen(
             // --- BOTÃO DE ELIMINAR CONTA ---
             TextButton(
                 onClick = { showDeleteDialog = true },
-                colors = ButtonDefaults.textButtonColors(contentColor = Color.Gray)
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurfaceVariant)
             ) {
                 Icon(Icons.Default.DeleteForever, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(8.dp))
@@ -184,7 +184,7 @@ fun UserScreen(
             Text(
                 text = appVersion,
                 fontSize = 12.sp,
-                color = Color.LightGray,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.Normal
             )
 

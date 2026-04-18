@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.outlined.AccountCircle
@@ -48,6 +49,14 @@ import com.ixsvf.almanaboca.screens.components.MartaBanner
 import com.ixsvf.almanaboca.screens.components.PaddingBox
 import com.ixsvf.almanaboca.screens.components.SummaryTopPageText
 import com.ixsvf.almanaboca.services.model.HomeItem
+import com.ixsvf.almanaboca.ui.theme.AccentPurple
+import com.ixsvf.almanaboca.ui.theme.CardWhite
+import com.ixsvf.almanaboca.ui.theme.PromoYellowBg
+import com.ixsvf.almanaboca.ui.theme.PromoYellowText
+import com.ixsvf.almanaboca.ui.theme.SpotifyGreen
+import com.ixsvf.almanaboca.ui.theme.TextDark
+import com.ixsvf.almanaboca.ui.theme.TextGray
+import com.ixsvf.almanaboca.ui.theme.WhatsAppGreen
 import com.ixsvf.almanaboca.ui.theme.states.HomeUiState
 import com.ixsvf.almanaboca.viewmodel.HomeViewModel
 import com.ixsvf.almanaboca.viewmodel.SessionViewModel
@@ -56,15 +65,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-// --- Cores ---
-private val CardWhite = Color.White
-val TextGray = Color(0xFF6B7280)
-val TextDark = Color(0xFF1F2937)
-private val PromoYellowBg = Color(0xFFFFF9C4)
-private val PromoYellowText = Color(0xFFB7791F)
-private val SpotifyGreen = Color(0xFF1DB954)
-private val WhatsAppGreen = Color(0xFF25D366) // Cor do WhatsApp
-val AccentPurple = Color(0xFF7C4DFF)
 
 // --- CONFIGURAÇÃO DE ADMINS ---
 private val ADMIN_EMAILS = listOf(AlmanaBocaConstants.ADMINS.MARTA, AlmanaBocaConstants.ADMINS.IVO)
@@ -102,7 +102,7 @@ fun HomeScreen(
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(stringResource(R.string.lbl_err_loading_data), color = Color.Red, fontWeight = FontWeight.Bold)
-                        Text(state.message, color = Color.Gray, fontSize = 12.sp)
+                        Text(state.message, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
                     }
                 }
             }
@@ -144,7 +144,7 @@ fun HomeScreen(
                             Icon(
                                 imageVector = Icons.Outlined.AccountCircle,
                                 contentDescription = "Perfil",
-                                tint = TextDark,
+                                tint = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.size(28.dp)
                             )
                         }
@@ -171,7 +171,7 @@ fun HomeScreen(
                                 }) }
                             }
                         } else {
-                            PaddingBox { Text(stringResource(R.string.lbl_coach_programs_not_available), color = TextGray) }
+                            PaddingBox { Text(stringResource(R.string.lbl_coach_programs_not_available), color = MaterialTheme.colorScheme.onSurfaceVariant) }
                         }
 
                         // Meditação
@@ -181,7 +181,7 @@ fun HomeScreen(
 
                                 MeditationCircleCard(item = meditationItem, userName = userName)
                             } else {
-                                Text(stringResource(R.string.lbl_meditations_next_meditations), color = TextGray)
+                                Text(stringResource(R.string.lbl_meditations_next_meditations), color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
 
@@ -225,9 +225,9 @@ fun HomeScreen(
                                 MartaBanner(size = 110.dp)
                                 Spacer(modifier = Modifier.width(16.dp))
                                 Column(modifier = Modifier.weight(1f)) {
-                                    Text(stringResource(R.string.lbl_marta_banner), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = TextDark)
+                                    Text(stringResource(R.string.lbl_marta_banner), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                                     Spacer(modifier = Modifier.height(4.dp))
-                                    Text(stringResource(R.string.lbl_marta_banner_mission), style = MaterialTheme.typography.bodySmall, color = TextGray, lineHeight = 18.sp, maxLines = 5, overflow = TextOverflow.Ellipsis)
+                                    Text(stringResource(R.string.lbl_marta_banner_mission), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, lineHeight = 18.sp, maxLines = 5, overflow = TextOverflow.Ellipsis)
                                 }
                             }
                         }
@@ -255,7 +255,7 @@ fun HomeScreen(
 @Composable
 fun ProgramCarouselCard(item: HomeItem, onClick: () -> Unit) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
@@ -264,9 +264,9 @@ fun ProgramCarouselCard(item: HomeItem, onClick: () -> Unit) {
             .clickable { onClick() }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(item.coachProgram.ifEmpty { "Programa" }, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = TextDark, maxLines = 2)
+            Text(item.coachProgram.ifEmpty { "Programa" }, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, maxLines = 2)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(item.whatToExpectProgram.ifEmpty { stringResource(R.string.lbl_no_description) }, style = MaterialTheme.typography.bodySmall, color = TextGray, maxLines = 4)
+            Text(item.whatToExpectProgram.ifEmpty { stringResource(R.string.lbl_no_description) }, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 4)
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
             Spacer(modifier = Modifier.height(12.dp))
@@ -335,15 +335,15 @@ fun MeditationCircleCard(item: HomeItem, userName: String) {
     val isRegistrationOpen = sessionInfo.second
 
     Card(
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier.fillMaxWidth().wrapContentHeight()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(item.meditationCirclesType.ifEmpty { stringResource(R.string.lbl_meditations_in_group) }, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = TextDark)
+            Text(item.meditationCirclesType.ifEmpty { stringResource(R.string.lbl_meditations_in_group) }, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(item.meditationCirclesDesc.ifEmpty { stringResource(R.string.lbl_meditations_join_us) }, style = MaterialTheme.typography.bodySmall, color = TextGray)
+            Text(item.meditationCirclesDesc.ifEmpty { stringResource(R.string.lbl_meditations_join_us) }, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
             Spacer(modifier = Modifier.height(12.dp))
@@ -382,7 +382,7 @@ fun MeditationCircleCard(item: HomeItem, userName: String) {
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp)
             ) {
-                Icon(Icons.Default.Send, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = if (isRegistrationOpen) stringResource(R.string.lbl_sign_me_now) else stringResource(R.string.lbl_registration_closed),
@@ -402,7 +402,7 @@ fun MeditationCircleCard(item: HomeItem, userName: String) {
 fun CommunityCard(onClick: () -> Unit) {
     Card(
         onClick = onClick,
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier.fillMaxWidth().wrapContentHeight()
@@ -423,8 +423,8 @@ fun CommunityCard(onClick: () -> Unit) {
             Spacer(modifier = Modifier.width(16.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text("Comunidade AlmaNaBoca", fontWeight = FontWeight.Bold, color = TextDark)
-                Text("Espaço exclusivo de partilha e apoio.", fontSize = 12.sp, color = TextGray)
+                Text("Comunidade AlmaNaBoca", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                Text("Espaço exclusivo de partilha e apoio.", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
 
             Icon(Icons.Default.Send, null, tint = AccentPurple.copy(alpha = 0.5f), modifier = Modifier.size(20.dp))
@@ -507,7 +507,7 @@ fun DetailRowSmall(icon: ImageVector, text: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(icon, null, tint = AccentPurple, modifier = Modifier.size(18.dp))
         Spacer(modifier = Modifier.width(8.dp))
-        Text(text, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = TextDark)
+        Text(text, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
     }
 }
 
