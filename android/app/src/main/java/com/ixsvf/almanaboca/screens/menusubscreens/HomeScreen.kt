@@ -101,7 +101,7 @@ fun HomeScreen(
             is HomeUiState.Error -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Erro ao carregar dados", color = Color.Red, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.lbl_err_loading_data), color = Color.Red, fontWeight = FontWeight.Bold)
                         Text(state.message, color = Color.Gray, fontSize = 12.sp)
                     }
                 }

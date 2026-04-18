@@ -90,6 +90,7 @@
     <string name="lbl_next_one">Next</string>
     <string name="lbl_listen_on_spotify">Listen me on Spotify</string>
     <string name="lbl_sign_me_now">Sign me now</string>
-    <string name="lbl_registration_closed">Registration closed </string>
+    <string name="lbl_registration_closed">Registration closed</string>
+    <string name="lbl_err_loading_data">Error while loadind data</string>
 
 </resources>
