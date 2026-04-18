@@ -35,12 +35,13 @@ import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import com.ixsvf.almanaboca.R
 import com.ixsvf.almanaboca.screens.components.*
+import com.ixsvf.almanaboca.ui.theme.BrandRedMain
 import com.ixsvf.almanaboca.ui.theme.states.LoginUiState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.launch
 
-private val BrandRedMain = Color(0xFFC62828)
+
 
 @Composable
 fun LoginScreen(
