@@ -84,5 +84,12 @@
     <string name="lbl_unknown">Unknow</string>
     <string name="lbl_bookings_management">Bookings Management</string>
     <string name="lbl_shop_almanaboca">Shop</string>
+    <string name="lbl_explore_our_products">Explore our products</string>
+    <string name="lbl_available_soon">Available soon</string>
+    <string name="lbl_date_to_be_determined">Date to be determined</string>
+    <string name="lbl_next_one">Next</string>
+    <string name="lbl_listen_on_spotify">Listen me on Spotify</string>
+    <string name="lbl_sign_me_now">Sign me now</string>
+    <string name="lbl_registration_closed">Registration closed </string>
 
 </resources>
