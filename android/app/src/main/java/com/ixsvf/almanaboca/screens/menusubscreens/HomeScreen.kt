@@ -423,8 +423,8 @@ fun CommunityCard(onClick: () -> Unit) {
             Spacer(modifier = Modifier.width(16.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text("Comunidade AlmaNaBoca", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                Text("Espaço exclusivo de partilha e apoio.", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.lbl_community_almanaboca), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                Text(stringResource(R.string.lbl_exclusive_space_share_support), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
 
             Icon(Icons.Default.Send, null, tint = AccentPurple.copy(alpha = 0.5f), modifier = Modifier.size(20.dp))

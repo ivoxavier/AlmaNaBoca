@@ -92,5 +92,6 @@
     <string name="lbl_sign_me_now">Sign me now</string>
     <string name="lbl_registration_closed">Registration closed</string>
     <string name="lbl_err_loading_data">Error while loadind data</string>
+    <string name="lbl_exclusive_space_share_support">Exclusive space for sharing and support</string>
 
 </resources>
