@@ -2,6 +2,7 @@ package com.ixsvf.almanaboca.screens.menusubscreens
 
 import android.content.Intent
 import android.net.Uri
+import android.provider.Settings.Global.getString
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -197,7 +198,7 @@ fun HomeScreen(
                                     },
                                     onFailure = {
                                         // Se o Firebase disser que não ou der erro:
-                                        Toast.makeText(context, "Acesso negado. Verifica a tua subscrição.", Toast.LENGTH_LONG).show()
+                                        Toast.makeText(context, R.string.lbl_access_denied_verify_subscription, Toast.LENGTH_LONG).show()
                                     }
                                 )
                             }
@@ -427,7 +428,7 @@ fun CommunityCard(onClick: () -> Unit) {
                 Text(stringResource(R.string.lbl_exclusive_space_share_support), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
 
-            Icon(Icons.Default.Send, null, tint = AccentPurple.copy(alpha = 0.5f), modifier = Modifier.size(20.dp))
+            Icon(Icons.AutoMirrored.Filled.Send, null, tint = AccentPurple.copy(alpha = 0.5f), modifier = Modifier.size(20.dp))
         }
     }
 }
