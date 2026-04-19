@@ -238,11 +238,11 @@ fun HomeScreen(
                             SocialMediaIconsRow(
                                 "https://instagram.com/almanaboca",
                                 "https://facebook.com/almanaboca",
-                                "https://youtube.com/@almanaboca"
+                                "https://www.youtube.com/@almanaboca"
                             )
                         }
 
-                        PaddingBox { SpotifyButton("https://open.spotify.com/show/trupodcast") }
+                        PaddingBox { SpotifyButton("https://open.spotify.com/show/3AXU4aepcwmGWnG4RTZljh?si=963554d2ef6b470a") }
                         //Spacer(modifier = Modifier.height(100.dp))
                     }
                 }
@@ -265,14 +265,14 @@ fun ProgramCarouselCard(item: HomeItem, onClick: () -> Unit) {
             .clickable { onClick() }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(item.coachProgram.ifEmpty { "Programa" }, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, maxLines = 2)
+            Text(item.coachProgram.ifEmpty { stringResource(R.string.lbl_program) }, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, maxLines = 2)
             Spacer(modifier = Modifier.height(8.dp))
             Text(item.whatToExpectProgram.ifEmpty { stringResource(R.string.lbl_no_description) }, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 4)
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
             Spacer(modifier = Modifier.height(12.dp))
 
-            DetailRowSmall(Icons.Outlined.CalendarMonth, if (item.coachStartDate.isNotEmpty()) "${item.coachStartDate} - ${item.coachDateEnd}" else "Datas a anunciar")
+            DetailRowSmall(Icons.Outlined.CalendarMonth, if (item.coachStartDate.isNotEmpty()) "${item.coachStartDate} - ${item.coachDateEnd}" else stringResource(R.string.lbl_date_to_be_determined))
             Spacer(modifier = Modifier.height(8.dp))
             DetailRowSmall(Icons.Outlined.Groups, "${item.coachVacancies} " + stringResource(R.string.lbl_coach_vacancies))
 
@@ -525,7 +525,7 @@ fun SocialMediaIconsRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         SocialIconItem(R.drawable.ic_instagram, "Instagram", { uriHandler.openUri(instagramUrl) }, Color(0xFFE1306C))
-        SocialIconItem(R.drawable.ic_facebook, "Facebook", { uriHandler.openUri(facebookUrl) }, Color(0xFF1877F2))
+       // SocialIconItem(R.drawable.ic_facebook, "Facebook", { uriHandler.openUri(facebookUrl) }, Color(0xFF1877F2))
         SocialIconItem(R.drawable.ic_youtube, "YouTube", { uriHandler.openUri(youtubeUrl) }, Color(0xFFFF0000))
     }
 }

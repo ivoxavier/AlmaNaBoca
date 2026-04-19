@@ -94,5 +94,6 @@
     <string name="lbl_err_loading_data">Error while loadind data</string>
     <string name="lbl_exclusive_space_share_support">Exclusive space for sharing and support</string>
     <string name="lbl_access_denied_verify_subscription">Access denied. Please check your subscription</string>
+    <string name="lbl_program">Program</string>
 
 </resources>
