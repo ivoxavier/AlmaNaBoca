@@ -99,12 +99,12 @@ fun LoginScreen(
 
     Surface(
         modifier = modifier.fillMaxSize(),
-        color = Color.White
+        color = MaterialTheme.colorScheme.surface
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.surface)
         ) {
             CompositionLocalProvider(LocalContentColor provides Color.Black) {
 
@@ -153,9 +153,9 @@ fun LoginScreen(
                         ) {
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
-                                colors = CardDefaults.cardColors(containerColor = Color(0xFFF9F9F9)),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                                 shape = RoundedCornerShape(24.dp),
-                                border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.4f)),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.onSurfaceVariant),
                                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                             ) {
                                 Column(
@@ -169,7 +169,7 @@ fun LoginScreen(
                                     Text(
                                         text = stringResource(R.string.lbl_login_to_account),
                                         fontSize = 14.sp,
-                                        color = Color.Gray
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
 
                                     //Spacer(modifier = Modifier.height(32.dp))
@@ -244,7 +244,7 @@ fun LoginScreen(
                         // --- LINK RECUPERAR PASSWORD ---
                         Text(
                             text = stringResource(R.string.lbl_lost_password),
-                            color = Color.Gray,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 14.sp,
                             modifier = Modifier
                                 .clickable { showForgotPasswordDialog = true } // Abre o popup
@@ -258,14 +258,14 @@ fun LoginScreen(
 
                         Text(
                             text = appVersion,
-                            color = Color.LightGray,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 12.sp,
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
 
                         Text(
                             text = stringResource(R.string.lbl_developed_by) + " Ivo Xavier <ixsvf>",
-                            color = Color.LightGray,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 12.sp,
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
@@ -345,7 +345,7 @@ fun ForgotPasswordDialog(
                 enabled = !isLoading
             ) {
                 if (isLoading) {
-                    CircularProgressIndicator(color = Color.White, modifier = Modifier.size(16.dp))
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.surface, modifier = Modifier.size(16.dp))
                 } else {
                     Text(stringResource(R.string.lbl_send_email))
                 }
@@ -353,10 +353,10 @@ fun ForgotPasswordDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.lbl_cancel), color = Color.Gray)
+                Text(stringResource(R.string.lbl_cancel), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         },
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(16.dp)
     )
 }
@@ -395,7 +395,7 @@ fun PrivacyPolicyText(onClick: () -> Unit) {
     Text(
         text = annotatedString,
         style = MaterialTheme.typography.bodySmall.copy(
-            color = Color.Gray,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
             fontSize = 11.sp
         ),
@@ -429,10 +429,10 @@ fun PrivacyPolicyDialog(onDismiss: () -> Unit) {
                 onClick = onDismiss,
                 colors = ButtonDefaults.buttonColors(containerColor = BrandRedMain)
             ) {
-                Text(stringResource(R.string.lbl_close), color = Color.White)
+                Text(stringResource(R.string.lbl_close), color = MaterialTheme.colorScheme.surface)
             }
         },
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(16.dp)
     )
 }

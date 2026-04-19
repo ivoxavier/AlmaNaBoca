@@ -35,6 +35,7 @@ import androidx.navigation.NavController
 import com.ixsvf.almanaboca.R
 import com.ixsvf.almanaboca.constants.AlmanaBocaConstants
 import com.ixsvf.almanaboca.services.model.HomeItem
+import com.ixsvf.almanaboca.ui.theme.AccentPurple
 import com.ixsvf.almanaboca.ui.theme.BackgroundLight
 import com.ixsvf.almanaboca.ui.theme.BrandRedMain
 import com.ixsvf.almanaboca.ui.theme.TextDark
@@ -71,7 +72,7 @@ fun ProgramDetailScreen(
                         text = stringResource(R.string.lbl_program_detail),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = TextDark
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 navigationIcon = {
@@ -79,24 +80,24 @@ fun ProgramDetailScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.lbl_back),
-                            tint = TextDark
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
             )
         }
     ) { padding ->
         if (programItem == null) {
             Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                Text(stringResource(R.string.lbl_program_not_found), color = Color.Gray)
+                Text(stringResource(R.string.lbl_program_not_found), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         } else {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
-                    .background(Color.White)
+                    .background(MaterialTheme.colorScheme.surface)
             ) {
                 Column(
                     modifier = Modifier
@@ -127,7 +128,7 @@ fun ProgramDetailScreen(
                         text = programItem.coachProgram,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = TextDark,
+                        color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Center,
                         lineHeight = 30.sp
                     )
@@ -140,7 +141,7 @@ fun ProgramDetailScreen(
                     Text(
                         text = programItem.whatToExpectProgram.ifEmpty { stringResource(R.string.lbl_no_description) },
                         fontSize = 15.sp,
-                        color = TextGray,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 22.sp
                     )
 
@@ -152,7 +153,7 @@ fun ProgramDetailScreen(
                         Text(
                             text = programItem.idealFor,
                             fontSize = 15.sp,
-                            color = TextGray,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             lineHeight = 22.sp
                         )
                     }
@@ -165,7 +166,7 @@ fun ProgramDetailScreen(
                         Text(
                             text = programItem.youWillExperience,
                             fontSize = 15.sp,
-                            color = TextGray,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             lineHeight = 22.sp
                         )
                     }
@@ -183,7 +184,7 @@ fun ProgramDetailScreen(
                             Text(
                                 text = programItem.theResult,
                                 fontSize = 15.sp,
-                                color = TextDark,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 fontWeight = FontWeight.Medium,
                                 lineHeight = 22.sp,
                                 modifier = Modifier.padding(16.dp)
@@ -229,7 +230,7 @@ fun ProgramDetailScreen(
                 // --- BOTÃO FIXO NO FUNDO ---
                 Surface(
                     modifier = Modifier.fillMaxWidth().shadow(16.dp),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.surface,
                     tonalElevation = 8.dp
                 ) {
                     Box(modifier = Modifier.padding(24.dp)) {
@@ -251,12 +252,12 @@ fun ProgramDetailScreen(
                             shape = RoundedCornerShape(12.dp),
                             elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
                         ) {
-                            Icon(Icons.Default.Send, contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
+                            Icon(Icons.Default.Send, contentDescription = null, tint = MaterialTheme.colorScheme.surface, modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
                                 text = stringResource(R.string.lbl_sign_me),
                                 fontWeight = FontWeight.Bold,
-                                color = Color.White,
+                                color = MaterialTheme.colorScheme.surface,
                                 fontSize = 16.sp
                             )
                         }
@@ -271,9 +272,9 @@ fun ProgramDetailScreen(
 fun InfoSummaryCard(item: HomeItem) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = BackgroundLight),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(16.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.3f))
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.onSurfaceVariant)
     ) {
         Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
@@ -281,14 +282,14 @@ fun InfoSummaryCard(item: HomeItem) {
             val dates = if (item.coachStartDate.isNotEmpty()) "${item.coachStartDate} - ${item.coachDateEnd}" else stringResource(R.string.lbl_dates_to_announced)
             InfoRowDetail(icon = Icons.Outlined.CalendarMonth, title = stringResource(R.string.lbl_dates), value = dates)
 
-            HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
+            HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
 
             // VAGAS
             InfoRowDetail(icon = Icons.Outlined.Groups, title = stringResource(R.string.lbl_vacancies), value = "${item.coachVacancies} " + stringResource(R.string.lbl_vacancies_available))
 
             // --- NOVO: FORMATO (Individual ou Grupo) ---
             if (item.coachType.isNotEmpty()) {
-                HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
+                HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
                 InfoRowDetail(
                     icon = Icons.Outlined.Groups,
                     title = stringResource(R.string.lbl_coach_type),
@@ -298,7 +299,7 @@ fun InfoSummaryCard(item: HomeItem) {
 
             // ACESSO
             if (item.contentAccess.isNotEmpty()) {
-                HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
+                HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant)
                 InfoRowDetail(icon = Icons.Outlined.Devices, title = stringResource(R.string.lbl_access), value = item.contentAccess)
             }
         }
@@ -312,13 +313,13 @@ fun InfoSummaryCard(item: HomeItem) {
 @Composable
 fun DetailSectionTitle(title: String) {
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-        Box(modifier = Modifier.size( width = 4.dp, height = 20.dp).background(BrandRedMain, RoundedCornerShape(2.dp)))
+        Box(modifier = Modifier.size( width = 4.dp, height = 20.dp).background(AccentPurple, RoundedCornerShape(2.dp)))
         Spacer(modifier = Modifier.width(12.dp))
         Text(
             text = title.uppercase(),
             fontSize = 13.sp,
             fontWeight = FontWeight.Bold,
-            color = BrandRedMain,
+            color = AccentPurple,
             letterSpacing = 1.sp
         )
     }
@@ -329,11 +330,11 @@ fun DetailSectionTitle(title: String) {
 @Composable
 fun InfoRowDetail(icon: ImageVector, title: String, value: String) {
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-        Icon(icon, null, tint = BrandRedMain, modifier = Modifier.size(22.dp))
+        Icon(icon, null, tint = AccentPurple, modifier = Modifier.size(22.dp))
         Spacer(modifier = Modifier.width(16.dp))
         Column {
-            Text(text = title, fontSize = 12.sp, color = TextGray)
-            Text(text = value, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = TextDark)
+            Text(text = title, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(text = value, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
         }
     }
 }
@@ -342,16 +343,16 @@ fun InfoRowDetail(icon: ImageVector, title: String, value: String) {
 fun PaymentOptionCard(price: Double, description: String, discount: Double) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.3f))
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.onSurfaceVariant)
     ) {
         Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.CheckCircle, null, tint = BrandRedMain, modifier = Modifier.size(24.dp))
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = description.ifEmpty { stringResource(R.string.lbl_payment_option) }, fontSize = 14.sp, color = TextDark, fontWeight = FontWeight.Medium)
+                Text(text = description.ifEmpty { stringResource(R.string.lbl_payment_option) }, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Medium)
                 if (discount > 0) {
                     Text(text = "${discount.toInt()}%" + stringResource(R.string.lbl_discount_included), fontSize = 12.sp, color = Color(0xFF2E7D32), fontWeight = FontWeight.Bold)
                 }
