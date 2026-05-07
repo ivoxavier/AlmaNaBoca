@@ -1,5 +1,7 @@
 package com.ixsvf.almanaboca.screens.menusubscreens
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -28,7 +31,6 @@ import com.ixsvf.almanaboca.viewmodel.MeditationsViewModel
 
 @Composable
 fun MeditationsScreen(
-    // 1. ADICIONADO: O parâmetro modifier
     modifier: Modifier = Modifier,
     onVideoClick: (String) -> Unit,
     viewModel: MeditationsViewModel = viewModel()
@@ -36,28 +38,27 @@ fun MeditationsScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     Column(
-        // 2. APLICADO: O modifier passado é usado aqui
         modifier = modifier
             .fillMaxSize()
             .padding(top = 16.dp)
+            // IMPORTANTE: Adicionado padding no fundo para não ficar atrás da BottomBar flutuante
+            .padding(bottom = 100.dp)
     ) {
-        // ... (resto do código igual) ...
-        // Título da Secção
         Text(
             text = "Em destaque",
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface, // Adaptável ao tema
             modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
         )
 
         Text(
             text = "Uma jornada para a tranquilidade",
             style = MaterialTheme.typography.bodyLarge,
-            color = Color.Gray,
+            color = MaterialTheme.colorScheme.onSurfaceVariant, // Adaptável ao tema
             modifier = Modifier.padding(horizontal = 24.dp).padding(bottom = 16.dp)
         )
 
-        // Conteúdo da Lista
         when (uiState) {
             is MeditationsUiState.Loading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -66,7 +67,7 @@ fun MeditationsScreen(
             }
             is MeditationsUiState.Error -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Erro ao carregar meditações.")
+                    Text("Erro ao carregar meditações.", color = MaterialTheme.colorScheme.error)
                 }
             }
             is MeditationsUiState.Success -> {
@@ -86,27 +87,42 @@ fun MeditationsScreen(
     }
 }
 
-// ... MeditationCardHero mantém-se igual ...
 @Composable
 fun MeditationCardHero(
     video: PlaylistItem,
     onClick: (String) -> Unit
 ) {
+    // --- CORREÇÃO DO CRASH: Safe Access ---
+    val imageUrl = remember(video) {
+        video.snippet?.thumbnails?.medium?.url
+            ?: video.snippet?.thumbnails?.default?.url
+            ?: "" // Fallback para string vazia em vez de crashar
+    }
+
     Card(
         modifier = Modifier
             .width(280.dp)
             .height(350.dp)
-            .clickable { onClick(video.snippet.resourceId.videoId) },
+            .clickable {
+                // Proteção extra: só clica se houver ID
+                video.snippet?.resourceId?.videoId?.let { onClick(it) }
+            },
         shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface // Adaptável Dark/Light
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
+            // Imagem com proteção
             AsyncImage(
-                model = video.snippet.thumbnails.medium.url,
+                model = imageUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
+
+            // Gradiente para leitura do texto
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -115,19 +131,20 @@ fun MeditationCardHero(
                             colors = listOf(
                                 Color.Transparent,
                                 Color.Transparent,
-                                Color.Black.copy(alpha = 0.7f),
-                                Color.Black.copy(alpha = 0.9f)
+                                Color.Black.copy(alpha = 0.6f),
+                                Color.Black.copy(alpha = 0.85f)
                             )
                         )
                     )
             )
+
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .padding(20.dp)
             ) {
                 Text(
-                    text = video.snippet.title,
+                    text = video.snippet?.title ?: "Meditação Sem Título",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
